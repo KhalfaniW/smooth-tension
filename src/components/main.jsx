@@ -14,6 +14,7 @@ import lodash, {uniq} from "lodash";
 import {MeditationTimer} from "components/timers";
 import {Stack} from "components/react-layout";
 import CalmPlaylist from "components/calm-playlist";
+import WorkBreakTimer from "components/work-break-timer";
 
 // import MeditationTimerGroup from "pages/meditation-timer-group";
 
@@ -55,8 +56,11 @@ export default function Main() {
   return (
     <>
       <Stack width="100%">
-        <MeditationTimer seconds={6} />
+        <MeditationTimer isColored={true} seconds={120} />
         <CalmPlaylist />
+        <MeditationTimer isColored={true} seconds={300} />
+
+        <WorkBreakTimer />
       </Stack>
     </>
   );
