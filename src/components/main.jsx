@@ -7,7 +7,7 @@ import {
   Radio,
   RadioGroup,
 } from "@material-ui/core";
-import {useMap, useSet} from "react-use";
+import {useMap} from "react-use";
 import React, {useEffect, useState} from "react";
 import lodash, {uniq} from "lodash";
 
@@ -15,6 +15,8 @@ import {MeditationTimer} from "components/timers";
 import {Stack} from "components/react-layout";
 import CalmPlaylist from "components/calm-playlist";
 import WorkBreakTimer from "components/work-break-timer";
+
+import {InternalValuesPage} from "./value-chart";
 
 // import MeditationTimerGroup from "pages/meditation-timer-group";
 
@@ -56,83 +58,22 @@ export default function Main() {
   return (
     <>
       <Stack width="100%">
-        <MeditationTimer isColored={true} seconds={120} />
-        <CalmPlaylist />
         <MeditationTimer isColored={true} seconds={300} />
+        <MeditationTimer isColored={true} seconds={180} />
+        <MeditationTimer isColored={true} seconds={120} />
+        <MeditationTimer isColored={true} seconds={60} />
+        <MeditationTimer isColored={true} seconds={15} />
 
+        <CalmPlaylist />
+        <InternalValuesPage />
         <WorkBreakTimer />
       </Stack>
     </>
   );
 }
 
-function DiscomfortLocator() {
-  // categoriesAndChoices,
-  // partsToSelect = ["Head", "torso"],
-
-  let uniqueDiscomfortLocations = [
-    {category: "Head", choices: ["face", "back", "top", "middle"]},
-    {category: "Left Arm", choices: ["shoulder", "hand", "forearm", "bicep"]},
-    {category: "Right Arm", choices: ["shoulder", "hand", "forearm", "bicep"]},
-    {category: "Left Leg", choices: ["shins", "calf", "knee", "left foot"]},
-    {category: "Right Leg", choices: ["shins", "calf", "knee", "right foot"]},
-    {
-      category: "Torso",
-      choices: ["chest", "upper back", "lower back", "stomach"],
-    },
-  ];
-  let discomfortCategories = uniqueDiscomfortLocations.map(
-    (categoryAndChoice) => {
-      return categoryAndChoice.category;
-    },
-  );
-
-  let discomfortCategoriesSet = uniq(discomfortCategories);
-
-  const [
-    selectedDiscomfortCategoriesSet,
-    {
-      add: addCategory,
-      remove: removeCategory,
-      has: getIsInCategorySet,
-      toggle: toggle1,
-    },
-  ] = useSet(new Set([]));
-
-  let discomfortLocationSetToDiveDeeperInto = uniqueDiscomfortLocations.filter(
-    (discomfortLocation) => {
-      return getIsInCategorySet(discomfortLocation.category);
-    },
-  );
-  return (
-    <>
-      <>
-        <CheckboxGroup
-          title={"Where do you feel any discomfort"}
-          uniqueChoices={discomfortCategoriesSet}
-          onDeselect={(deselectedItem) => {
-            removeCategory(deselectedItem);
-          }}
-          onSelect={(selectedItem) => {
-            addCategory(selectedItem);
-          }}
-        />
-
-        <h1>Dive Deeper</h1>
-        {discomfortLocationSetToDiveDeeperInto.map((categoryAndChoice) => {
-          return (
-            <CheckboxGroup
-              //you can use the category as a key becuase it is a set
-              key={categoryAndChoice.category}
-              title={categoryAndChoice.category}
-              uniqueChoices={categoryAndChoice.choices}
-              onSelect={(selectedItems) => console.log({selectedItems})}
-            />
-          );
-        })}
-      </>
-    </>
-  );
+export function Options() {
+  return <div></div>;
 }
 function throwIfHasDuplicates(original_items) {
   const items = [...original_items];
@@ -145,7 +86,7 @@ function throwIfHasDuplicates(original_items) {
   throw `item group cannot have duplicates items = ${items}`;
 }
 
-//TODO CHECK ITEMS UNIQUE
+//TODO don't +CHECK ITEMS UNIQUE+ use use effect to create static id [P4fc]
 export function CheckboxGroup({
   title,
   uniqueChoices,

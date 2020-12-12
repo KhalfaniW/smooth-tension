@@ -1,12 +1,13 @@
-import { Button } from '@material-ui/core';
+import {Button} from "@material-ui/core";
 import {useAudio} from "react-use";
 import InputAdornment from "@material-ui/core/InputAdornment";
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from "react";
 import TextField from "@material-ui/core/TextField";
 
 import {ProdcutivityTimer} from "components/timers";
 import {Stack, ItemLine} from "components/react-layout";
 import pianoAlarm from "resources/piano-alarm-clip.mp3";
+import Sound from "react-sound";
 
 export default function WorkBreakTimer({
   onBreakTimeFinish = () => {},
@@ -16,7 +17,9 @@ export default function WorkBreakTimer({
 
   return (
     <>
-      {isAlarmEnabled && <TimerAlarm />}
+      {isAlarmEnabled && (
+        <TimerAlarm onAlarmCancel={() => setIsAlarmEnabled(false)} />
+      )}
       <WorkBreakTimerWithoutAlarm
         onWorkTimeFinish={() => setIsAlarmEnabled(true)}
         onBreakTimeFinish={() => setIsAlarmEnabled(true)}
@@ -27,31 +30,34 @@ export default function WorkBreakTimer({
 }
 
 export function TimerAlarm({onAlarmCancel}) {
-  const [audio, state, controls, ref] = useAudio({
-    src: pianoAlarm,
-    // autoPlay: true,
-  });
+  // const [audio, state, controls, ref] = useAudio({
+  //   src: pianoAlarm,
+  //   autoPlay: true,
+  // });
   //TODO loop and stop
   const [isAlarmDismissed, setIsAlarmDismissed] = useState(false);
-  useEffect(() => {
-    controls.play();
-  }, []);
-  const isSoundAtEnd = state.time === state.duration;
-  //TODO loop
+  const [playing, setPlaying] = useState(true);
   return (
-    <div>
-      {audio}
-      isSoundAtEnd = {isSoundAtEnd}
-      <pre>{JSON.stringify(state, null, 2)}</pre>
-      <button onClick={controls.pause}>Pause </button>
-      <button onClick={controls.play}>Play</button>
-      <button onClick={() => controls.volume(0.1)}>Volume: 10%</button>
-      <button onClick={() => controls.volume(0.5)}>Volume: 50%</button>
-      <button onClick={() => controls.volume(1)}>Volume: 100%</button>
-      <br />
-      <button onClick={() => controls.seek(state.time - 5)}>-5 sec</button>
-      <button onClick={() => controls.seek(0)}>reset</button>
-    </div>
+    <>
+      {isAlarmDismissed ? null : (
+        <>
+          <Sound
+            url={pianoAlarm}
+            playStatus={Sound.status.PLAYING}
+            playFromPosition={0}
+            loop={!isAlarmDismissed}
+          />
+        </>
+      )}
+      <button
+        onClick={() => {
+          setIsAlarmDismissed(true);
+          onAlarmCancel();
+        }}
+      >
+        Stop
+      </button>
+    </>
   );
 }
 
@@ -67,7 +73,7 @@ export function WorkBreakTimerWithoutAlarm({
     <>
       <Stack width="50%">
         Time Presets
-        <Stack width="50%">
+        <Stack spacing={3} width="50%">
           Work
           <ProdcutivityTimer
             onComplete={onWorkTimeFinish}
@@ -115,34 +121,41 @@ export function WorkBreakTimerWithoutAlarm({
           </Button>
         </ItemLine>
         <h2>Set Timers</h2>
-        <TextField
-          label="Minutes for Work"
-          type="number"
-          onChange={(event) => {
-            setWorkTimerMinutes(event.target.value);
-            onNewTimeSet();
-          }}
-          endAdorent={<InputAdornment position="end">m</InputAdornment>}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          variant="outlined"
-          value={workTimerMinutes}
-        />{" "}
-        <TextField
-          label="Minutes for Break"
-          type="number"
-          onChange={(event) => {
-            setBreakTimerMinutes(event.target.value);
-            onNewTimeSet();
-          }}
-          endAdorent={<InputAdornment position="end">m</InputAdornment>}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          variant="outlined"
-          value={breakTimerMinutes}
-        />
+        <Stack spacing={3}>
+          <TextField
+            label="Minutes for Work"
+            type="number"
+            onChange={(event) => {
+              setWorkTimerMinutes(event.target.value);
+              onNewTimeSet();
+            }}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">m</InputAdornment>,
+            }}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            variant="outlined"
+            value={workTimerMinutes}
+          />
+          <TextField
+            label="Minutes for Break"
+            type="number"
+            onChange={(event) => {
+              setBreakTimerMinutes(event.target.value);
+              onNewTimeSet();
+            }}
+            InputProps={{
+              endAdornment: <InputAdornment position="end">m</InputAdornment>,
+            }}
+            variant="outlined"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            variant="outlined"
+            value={breakTimerMinutes}
+          />
+        </Stack>
       </Stack>
     </>
   );

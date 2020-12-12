@@ -9,7 +9,13 @@ export default function CalmPlaylist({containerStyle}) {
   const [isMuted, setIsMuted] = useState(true);
 
   const [player, setPlayer] = useState(null);
-
+  const videoIdGroup = [
+    "Mw9qiV7XlFs",
+    "TjsDd5ZKIfA",
+    "ZOZOqbK86t0",
+    "v0vrhCqFUFE",
+  ];
+  const [videoIndex, setVideoIndex] = useState(0);
   function toggleMute() {
     if (isMuted) {
       player.unMute();
@@ -25,30 +31,16 @@ export default function CalmPlaylist({containerStyle}) {
         id="calmPlaylist"
         style={{...containerStyle, display: "flex", flexDirection: "column"}}
       >
-        <h1
-          style={{
-            display: "inline-block",
-            width: "30%",
-            fontSize: "large!important",
-            fontWeight: "bold",
-            textAlign: "center",
-            background: "white",
-            borderRadius: "10px",
-          }}
-        >
-          Calming Video
-        </h1>
-        <button onClick={toggleMute}> {isMuted ? "Un-Mute" : "Mute"}</button>
         <div style={{flexGrow: "1"}}>
           {/* use div to manage size dynamically */}
           <YouTube
-            videoId={"Mw9qiV7XlFs"} // defaults -> null
+            videoId={videoIdGroup[videoIndex]} // defaults -> null
             opts={{
               width: "100%",
               height: "100%",
               playerVars: {
                 // https://developers.google.com/youtube/player_parameters
-                autoplay: 1,
+                autoplay: false,
               },
             }}
             containerClassName={"youtubeHolder"}
@@ -60,6 +52,16 @@ export default function CalmPlaylist({containerStyle}) {
               setPlayer(event.target);
             }}
           />
+          <button onClick={toggleMute}> {isMuted ? "Un-Mute" : "Mute"}</button>
+          <button
+            onClick={() => {
+              setVideoIndex(
+                (videoIndex) => (videoIndex + 1) % videoIdGroup.length,
+              );
+            }}
+          >
+            "Next"
+          </button>
         </div>
       </div>
     </>
