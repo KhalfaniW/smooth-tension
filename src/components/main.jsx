@@ -6,6 +6,7 @@ import {
   FormLabel,
   Radio,
   RadioGroup,
+  TextField,
 } from "@material-ui/core";
 import {useMap} from "react-use";
 import React, {useEffect, useState} from "react";
@@ -16,8 +17,10 @@ import {Stack} from "components/react-layout";
 import CalmPlaylist from "components/calm-playlist";
 import WorkBreakTimer from "components/work-break-timer";
 
+import produce from "immer";
 import {InternalValuesPage} from "./value-chart";
-
+import {RandomRewardCreator} from "./random-reward";
+import {Game} from "./gamify";
 // import MeditationTimerGroup from "pages/meditation-timer-group";
 
 let infoForWhyMustBelive = `
@@ -58,22 +61,20 @@ export default function Main() {
   return (
     <>
       <Stack width="100%">
-        <MeditationTimer isColored={true} seconds={300} />
-        <MeditationTimer isColored={true} seconds={180} />
-        <MeditationTimer isColored={true} seconds={120} />
-        <MeditationTimer isColored={true} seconds={60} />
-        <MeditationTimer isColored={true} seconds={15} />
-
         <CalmPlaylist />
-        <InternalValuesPage />
+        <MeditationTimer isColored={true} seconds={300} />
+        <RandomRewardCreator successProbabilityPercentDecimal={0.5} />
+        <TextField
+          id="standard-multiline-static"
+          label="How do you feel"
+          multiline
+          rows={4}
+        />
+        <Game />
         <WorkBreakTimer />
       </Stack>
     </>
   );
-}
-
-export function Options() {
-  return <div></div>;
 }
 function throwIfHasDuplicates(original_items) {
   const items = [...original_items];

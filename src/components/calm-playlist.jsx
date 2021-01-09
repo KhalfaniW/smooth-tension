@@ -12,6 +12,7 @@ export default function CalmPlaylist({containerStyle}) {
   const videoIdGroup = [
     "Mw9qiV7XlFs",
     "TjsDd5ZKIfA",
+    "3rDjPLvOShM",
     "ZOZOqbK86t0",
     "v0vrhCqFUFE",
   ];
@@ -26,44 +27,42 @@ export default function CalmPlaylist({containerStyle}) {
     }
   }
   return (
-    <>
-      <div
-        id="calmPlaylist"
-        style={{...containerStyle, display: "flex", flexDirection: "column"}}
-      >
-        <div style={{flexGrow: "1"}}>
-          {/* use div to manage size dynamically */}
-          <YouTube
-            videoId={videoIdGroup[videoIndex]} // defaults -> null
-            opts={{
-              width: "100%",
-              height: "100%",
-              playerVars: {
-                // https://developers.google.com/youtube/player_parameters
-                autoplay: false,
-              },
-            }}
-            containerClassName={"youtubeHolder"}
-            onReady={(event) => {
-              if (isMuted) {
-                event.target.mute();
-                console.log("mute it");
-              }
-              setPlayer(event.target);
-            }}
-          />
-          <button onClick={toggleMute}> {isMuted ? "Un-Mute" : "Mute"}</button>
-          <button
-            onClick={() => {
-              setVideoIndex(
-                (videoIndex) => (videoIndex + 1) % videoIdGroup.length,
-              );
-            }}
-          >
-            "Next"
-          </button>
-        </div>
+    <div
+      id="calmPlaylist"
+      style={{...containerStyle, display: "flex", flexDirection: "column"}}
+    >
+      <div style={{flexGrow: "1"}}>
+        {/* use div to manage size dynamically */}
+        <YouTube
+          videoId={videoIdGroup[videoIndex]} // defaults -> null
+          opts={{
+            width: "100%",
+            height: "100%",
+            playerVars: {
+              // https://developers.google.com/youtube/player_parameters
+              autoplay: false,
+            },
+          }}
+          containerClassName={"youtubeHolder"}
+          onReady={(event) => {
+            if (isMuted) {
+              event.target.mute();
+              console.log("mute it");
+            }
+            setPlayer(event.target);
+          }}
+        />
+        <button onClick={toggleMute}> {isMuted ? "Un-Mute" : "Mute"}</button>
+        <button
+          onClick={() => {
+            setVideoIndex(
+              (videoIndex) => (videoIndex + 1) % videoIdGroup.length,
+            );
+          }}
+        >
+          "Next"
+        </button>
       </div>
-    </>
+    </div>
   );
 }

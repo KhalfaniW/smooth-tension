@@ -102,52 +102,54 @@ function getFormattedTime(timeInSeconds) {
 export function ProdcutivityTimer({seconds, onComplete = () => {}}) {
   return (
     <>
-      <ControlledCountdown
-        seconds={seconds}
-        onComplete={onComplete}
-        renderView={({
-          hours,
-          minutes,
-          seconds,
-          start,
-          pause,
-          reset,
-          isRunning,
-        }) => {
-          const totalRemainingSeconds = hours * 360 + minutes * 60 + seconds;
-          let formattedTime = getFormattedTime(totalRemainingSeconds);
-          return (
-            <>
-              {formattedTime}
-              {isRunning ? (
-                <button
-                  onClick={() => {
-                    pause();
-                  }}
-                >
-                  pause
-                </button>
-              ) : (
-                <button
-                  onClick={() => {
-                    start();
-                  }}
-                >
-                  Start
-                </button>
-              )}
+      <div>
+        <ControlledCountdown
+          seconds={seconds}
+          onComplete={onComplete}
+          renderView={({
+            hours,
+            minutes,
+            seconds,
+            start,
+            pause,
+            reset,
+            isRunning,
+          }) => {
+            const totalRemainingSeconds = hours * 360 + minutes * 60 + seconds;
+            let formattedTime = getFormattedTime(totalRemainingSeconds);
+            return (
+              <>
+                {formattedTime}
+                {isRunning ? (
+                  <button
+                    onClick={() => {
+                      pause();
+                    }}
+                  >
+                    pause
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      start();
+                    }}
+                  >
+                    Start
+                  </button>
+                )}
 
-              <button
-                onClick={() => {
-                  reset();
-                }}
-              >
-                Reset
-              </button>
-            </>
-          );
-        }}
-      />
+                <button
+                  onClick={() => {
+                    reset();
+                  }}
+                >
+                  Reset
+                </button>
+              </>
+            );
+          }}
+        />
+      </div>
     </>
   );
 }
