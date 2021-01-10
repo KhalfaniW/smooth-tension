@@ -116,7 +116,7 @@ function createState() {
         throttle(() => console.log(ifvisible.now()), 1000);
 
         if (state.millisecondsPassed % 1000 == 0) {
-          console.log("NOT VISIBLE", Date().toString());
+          console.log(ifvisible.now(), Date().toString());
         }
         if (!ifvisible.now()) {
           // Display pop-up
