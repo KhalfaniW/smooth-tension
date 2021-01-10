@@ -105,13 +105,24 @@ function disable() {}
 
 function createState() {
   let state = createGameState();
+  state = addIntervalEvent(
+    state,
+    createEventWithInterval({
+      id: "CHECK_IF_USER_HAS_LEFT_PAGE",
+      intervalMilliseconds:
+        state.defaultIncrementInterval / state.speedMultiplier,
+      runEvent: (state) => {
+        () => {
+          if (!ifvisible.now()) {
+            // Display pop-up
+            console.log("NOT VISIBLE", Date().toString());
+          }
+        };
+        return state;
+      },
+    }),
+  );
 
-  state.onTickEvent = () => {
-    if (!ifvisible.now()) {
-      // Display pop-up
-      console.log("NOT VISIBLE", Date().toString());
-    }
-  };
   state = addIntervalEvent(
     state,
     createEventWithInterval({
