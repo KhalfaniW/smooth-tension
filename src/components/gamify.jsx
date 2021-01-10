@@ -2,9 +2,9 @@
 import {Checkbox, FormControlLabel} from "@material-ui/core";
 import PageVisibility from "react-page-visibility";
 import React, {useState, useEffect} from "react";
+import ifvisible from "ifvisible.js";
 import produce from "immer";
 
-import ifvisible from "ifvisible.js";
 import {
   addIntervalEvent,
   addOneTimeEvent,
@@ -113,7 +113,7 @@ function createState() {
         state.defaultIncrementInterval / state.speedMultiplier,
       runEvent: (state) => {
         () => {
-          thottle(() => console.log(ifvisible.now()), 1000);
+          throttle(() => console.log(ifvisible.now()), 1000);
 
           if (!ifvisible.now()) {
             // Display pop-up
