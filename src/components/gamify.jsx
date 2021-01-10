@@ -4,6 +4,7 @@ import PageVisibility from "react-page-visibility";
 import React, {useState, useEffect} from "react";
 import ifvisible from "ifvisible.js";
 import produce from "immer";
+import {throttle} from "lodash";
 
 import {
   addIntervalEvent,
