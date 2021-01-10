@@ -63,22 +63,23 @@ export function Game({gameState = createState(0)}) {
           value: true,
         })
       }
-      onMouseLeave={() =>
+      onMouseLeave={() => {
         dispatch({
           type: "SET_VARIABLE",
           property: "isVisible",
           value: false,
-        })
-      }
+        });
+        console.log("hi");
+      }}
     >
       Keep Mouse in area
       <PageVisibility
         onChange={(isVisible) => {
-          dispatch({
-            type: "SET_VARIABLE",
-            property: "isVisible",
-            value: isVisible,
-          });
+          /* dispatch({ */
+          /*   type: "SET_VARIABLE", */
+          /*   property: "isVisible", */
+          /*   value: isVisible, */
+          /* }); */
         }}
       ></PageVisibility>
       <button
