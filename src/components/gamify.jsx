@@ -56,20 +56,21 @@ export function Game({gameState = createState(0)}) {
 
   return (
     <div
-      onMouseEnter={() =>
+      onMouseEnter={() => {
         dispatch({
           type: "SET_VARIABLE",
           property: "isVisible",
           value: true,
-        })
-      }
+        });
+        console.log("hi");
+      }}
       onMouseLeave={() => {
         dispatch({
           type: "SET_VARIABLE",
           property: "isVisible",
           value: false,
         });
-        console.log("hi");
+        console.log("bye");
       }}
     >
       Keep Mouse in area
