@@ -55,7 +55,16 @@ export function Game({gameState = createState(0)}) {
   useEffect(setupTimeEffect, []);
 
   return (
-    <div>
+    <div
+      onMouseEnter={() =>
+        dispatch({
+          type: "SET_VARIABLE",
+          property: "isVisible",
+          value: true,
+        })
+      }
+      onMouseLeave={() => setIsShown(false)}
+    >
       <PageVisibility
         onChange={(isVisible) => {
           dispatch({
