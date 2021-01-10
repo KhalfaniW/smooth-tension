@@ -63,7 +63,7 @@ export function Game({gameState = createState(0)}) {
           value: true,
         })
       }
-      onMouseEnter={() =>
+      onMouseLeave={() =>
         dispatch({
           type: "SET_VARIABLE",
           property: "isVisible",
