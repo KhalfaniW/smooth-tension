@@ -1,4 +1,3 @@
-/*global setInterval clearInterval*/
 import {Checkbox, FormControlLabel} from "@material-ui/core";
 import PageVisibility from "react-page-visibility";
 import React, {useState, useEffect} from "react";
