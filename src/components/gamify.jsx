@@ -105,6 +105,7 @@ function disable() {}
 
 function createState() {
   let state = createGameState();
+  console.log(ifvisible);
   state.onTickEvent = () => {
     if (!ifvisible.now()) {
       // Display pop-up
