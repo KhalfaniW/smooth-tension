@@ -4,7 +4,7 @@ import PageVisibility from "react-page-visibility";
 import React, {useState, useEffect} from "react";
 import produce from "immer";
 
-import ifvisible from "ifvisible";
+import ifvisible from "ifvisible.js";
 import {
   addIntervalEvent,
   addOneTimeEvent,
