@@ -113,14 +113,14 @@ function createState() {
       intervalMilliseconds:
         state.defaultIncrementInterval / state.speedMultiplier,
       runEvent: (state) => {
-        () => {
+        {
           throttle(() => console.log(ifvisible.now()), 1000);
 
           if (!ifvisible.now()) {
             // Display pop-up
             console.log("NOT VISIBLE", Date().toString());
           }
-        };
+        }
         return state;
       },
     }),
