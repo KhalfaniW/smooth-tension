@@ -63,7 +63,6 @@ export function Game({gameState = createState(0)}) {
           property: "isVisible",
           value: true,
         });
-        console.log("hi");
       }}
       onMouseLeave={() => {
         dispatch({
@@ -71,7 +70,6 @@ export function Game({gameState = createState(0)}) {
           property: "isVisible",
           value: false,
         });
-        console.log("bye");
       }}
     >
       Keep Mouse in area
@@ -110,7 +108,9 @@ export function Game({gameState = createState(0)}) {
         />
       </div>
       <ProgressView progressAmount={state.progressAmount} />
-      <div>Speed: {state.speedMultiplier}</div>
+      <div>
+        {state.isVisible}Speed: {state.speedMultiplier}
+      </div>
       <div>{state.isFocusModeEnabled ? "focused" : null} </div>
       {state.isRandomRewardChecked ? (
         <div>Reward: {state.reward}</div>
