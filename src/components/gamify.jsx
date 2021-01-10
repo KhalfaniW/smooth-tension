@@ -130,7 +130,6 @@ const GameWrapper = styled.div`
   color: #444;
   border: 1px solid #1890ff;
 `;
-function disable() {}
 
 function createState() {
   let state = createGameState();
