@@ -6,17 +6,6 @@ import produce from "immer";
 import {throttle} from "lodash";
 import styled from "styled-components";
 
-const GameWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  padding: 50px;
-  color: #444;
-  border: 1px solid #1890ff;
-`;
-
 import {
   addIntervalEvent,
   addOneTimeEvent,
@@ -131,6 +120,16 @@ export function Game({gameState = createState(0)}) {
     </GameWrapper>
   );
 }
+const GameWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 50px;
+  color: #444;
+  border: 1px solid #1890ff;
+`;
 function disable() {}
 
 function createState() {
