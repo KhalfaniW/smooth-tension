@@ -70,7 +70,6 @@ export function Game({gameState = createState(0)}) {
           value: false,
         })
       }
-      onMouseLeave={() => setIsShown(false)}
     >
       Keep Mouse in area
       <PageVisibility
