@@ -67,7 +67,7 @@ export function Game({gameState = createState(0)}) {
   useEffect(setupTimeEffect, []);
 
   return (
-    <div
+    <GameWrapper
       onMouseEnter={() => {
         dispatch({
           type: "SET_VARIABLE",
@@ -128,7 +128,7 @@ export function Game({gameState = createState(0)}) {
       ) : (
         <>Loading...</>
       )}
-    </div>
+    </GameWrapper>
   );
 }
 function disable() {}
