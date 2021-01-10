@@ -63,8 +63,16 @@ export function Game({gameState = createState(0)}) {
           value: true,
         })
       }
+      onMouseEnter={() =>
+        dispatch({
+          type: "SET_VARIABLE",
+          property: "isVisible",
+          value: false,
+        })
+      }
       onMouseLeave={() => setIsShown(false)}
     >
+      Keep Mouse in area
       <PageVisibility
         onChange={(isVisible) => {
           dispatch({
