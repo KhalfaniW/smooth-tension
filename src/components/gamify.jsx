@@ -109,7 +109,7 @@ function createState() {
   state.onTickEvent = () => {
     if (!ifvisible.now()) {
       // Display pop-up
-      console.log("NOT VISIBLE", Date.now());
+      console.log("NOT VISIBLE", Date().toString());
     }
   };
   state = addIntervalEvent(
