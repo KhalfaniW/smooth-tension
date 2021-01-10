@@ -2,24 +2,42 @@
 import {Checkbox, FormControlLabel} from "@material-ui/core";
 import PageVisibility from "react-page-visibility";
 import React, {useState, useEffect} from "react";
+import produce from "immer";
 
-import {addEvent, createEventWithInterval, reduceGameState} from "./gamelogic";
+import {
+  addIntervalEvent,
+  addOneTimeEvent,
+  createEventWithInterval,
+  createGameState,
+  createOneTimeEvent,
+  reduceGameState,
+} from "./gamelogic";
+import {getRandomNumberInclusive} from "./random-reward";
 
-export function Game({startAmount = 0}) {
-  const [state, setState] = useState(createState(startAmount));
+export function Game({gameState = createState(0)}) {
+  const [state, setState] = useState(gameState);
 
   function dispatch(event) {
     setState((state) => reduceGameState(state, event));
   }
   function handleCheckboxSelect(event) {
     switch (event.target.name) {
-      case "isActiveCheckBox":
+      case "checkBox_toggleIsActive":
         const speedChange = event.target.checked ? 1 : -1;
         const newSpeed = state.speedMultiplier + speedChange;
-        dispatch({
-          type: "SET_PROGRESS_INCREMENT_SPEED",
-          speedMultiplier: newSpeed,
-        });
+
+        if (event.target.checkbox) {
+          dispatch({
+            type: "SET_PROGRESS_INCREMENT_SPEED",
+            speedMultiplier: newSpeed,
+          });
+        } else {
+          dispatch({
+            type: "SET_PROGRESS_INCREMENT_SPEED",
+            speedMultiplier: newSpeed,
+          });
+        }
+
         break;
       default:
     }
@@ -34,18 +52,7 @@ export function Game({startAmount = 0}) {
     };
   };
   useEffect(setupTimeEffect, []);
-  useEffect(() => {
-    setTimeout(
-      () =>
-        dispatch({
-          type: "SET_VARIABLE",
-          property: "isRandomRewardChecked",
-          value: true,
-        }),
-      3000,
-    );
-    return () => {};
-  }, []);
+
   return (
     <div>
       <PageVisibility
@@ -62,7 +69,7 @@ export function Game({startAmount = 0}) {
           dispatch({type: "TOGGLE_BOOLEAN", property: "isFocusModeEnabled"});
         }}
       >
-        Get Focus
+        Start
       </button>
       <button
         onClick={() => {
@@ -78,7 +85,7 @@ export function Game({startAmount = 0}) {
         <FormControlLabel
           value="start"
           label="Sitting in an active position"
-          name="isActiveCheckBox"
+          name="checkBox_toggleIsActive"
           control={<Checkbox color="primary" onChange={handleCheckboxSelect} />}
         />
       </div>
@@ -93,21 +100,17 @@ export function Game({startAmount = 0}) {
     </div>
   );
 }
+function disable() {}
+
 function createState() {
-  let state = {
-    reward: 0,
-    isRandomRewardChecked: false,
-    millisecondsPassed: 0,
-    progressAmount: 88,
-    millisecondsPerTick: 50,
-    defaultIncrementInterval: 1000,
-    incrementAmount: 0.1,
-    speedMultiplier: 1,
-    isVisible: true,
-    timeIntervalEvents: [],
-    oneTimeEvents: [],
+  let state = createGameState();
+  state.onTickEvent = () => {
+    if (!ifvisible.now()) {
+      // Display pop-up
+      console.log("NOT VISIBLE", Date.now());
+    }
   };
-  state = addEvent(
+  state = addIntervalEvent(
     state,
     createEventWithInterval({
       id: "UPDATE_PROGRESS_ID",
@@ -125,7 +128,39 @@ function createState() {
       },
     }),
   );
+  state = addOneTimeEvent(
+    state,
+    createOneTimeEvent({
+      id: "SHOW_DELAYED_REWARD_ID",
+      runTime: 1000,
+      runEvent: (state) => {
+        return produce(state, (draftState) => {
+          let newState = reduceGameState(state, {
+            type: "SET_VARIABLE",
+            property: "isRandomRewardChecked",
+            value: true,
+          });
 
+          const randomNumberBetween1and100 = getRandomNumberInclusive({
+            min: 1,
+            max: 100,
+            seed: state.randomSeed,
+          });
+
+          const shouldGiveRandomReward = randomNumberBetween1and100 > 50;
+          if (shouldGiveRandomReward) {
+            newState = reduceGameState(newState, {
+              type: "SET_VARIABLE",
+              property: "progressAmount",
+              value: state.progressAmount + 7,
+            });
+          }
+
+          return newState;
+        });
+      },
+    }),
+  );
   return state;
 }
 export function ProgressView({progressAmount}) {
