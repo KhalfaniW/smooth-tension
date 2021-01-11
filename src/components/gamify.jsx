@@ -109,7 +109,7 @@ export function Game({gameState = createState(0)}) {
       </div>
       <ProgressView progressAmount={state.progressAmount} />
       <div>
-        {state.isVisible}Speed: {state.speedMultiplier}
+        {state.isVisible.toString()}Speed: {state.speedMultiplier}
       </div>
       <div>{state.isFocusModeEnabled ? "focused" : null} </div>
       {state.isRandomRewardChecked ? (
