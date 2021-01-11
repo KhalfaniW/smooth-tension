@@ -140,6 +140,7 @@ function createState() {
       intervalMilliseconds:
         state.defaultIncrementInterval / state.speedMultiplier,
       runEvent: (state) => {
+        console.log("time");
         if (state.isFocusModeEnabled && state.isVisible) {
           return reduceGameState(state, {
             type: "SET_VARIABLE",
