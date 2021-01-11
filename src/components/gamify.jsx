@@ -241,7 +241,6 @@ function getComputedProperties(gameState) {
 
   const totalPoints = progressPoints + gameState.userActionPoints;
   const pointsRemaining = totalPoints - gameState.pointsUsed;
-  console.log({totalPoints});
 
   const previousTotalReward = getPreviousPropertyValue({
     state: gameState,
