@@ -119,6 +119,16 @@ export function Game({gameState = createState(), seed = Date.now()}) {
           ? `Points ${state.points.remaining}/${state.points.total}`
           : null}{" "}
       </div>
+      <button
+        onClick={() => {
+          dispatch({
+            type: "SET_PROGRESS_INCREMENT_SPEED",
+            speedMultiplier: 2,
+          });
+        }}
+      >
+        Use Point
+      </button>
     </GameWrapper>
   );
 }
