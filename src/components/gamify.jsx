@@ -110,7 +110,9 @@ export function Game({gameState = createState(), seed = Date.now()}) {
       </div>
       <div>{state.isFocusModeEnabled ? "focused" : null} </div>
       {state.isRandomRewardChecked ? (
-          <div>Reward: {getRandomIntInclusive({min:0,max:10, state:state.seed)}</div>
+        <div>
+          Reward: {getRandomIntInclusive({min: 0, max: 10, seed: state.seed})}
+        </div>
       ) : (
         <>Loading...</>
       )}
