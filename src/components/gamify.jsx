@@ -100,7 +100,7 @@ export function Game({state = createState(), seed = Date.now()}) {
       <div>Speed: {gameState.speedMultiplier}</div>
       <div>{gameState.isFocusModeEnabled ? "focused" : null} </div>
       {gameState.isRandomRewardChecked ? (
-        <div>Reward: {gameState.initialReward}</div>
+        <div>Reward: {gameState.userActionPoints}</div>
       ) : (
         <>Calculating...</>
       )}
