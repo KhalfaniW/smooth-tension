@@ -116,14 +116,14 @@ export function Game({gameState = createState(), seed = Date.now()}) {
       )}
       <div>
         {totalPoints > 0
-          ? `Points ${state.points.remaining}/${totalPoints}`
+          ? `Points ${state.pointsRemaining}/${totalPoints}`
           : null}{" "}
       </div>
       <button
         onClick={() => {
           dispatch({
-            type: "SET_PROGRESS_INCREMENT_SPEED",
-            speedMultiplier: 2,
+            type: "SET_VARIABLE",
+            property: "pointsRemaining",
           });
         }}
       >
