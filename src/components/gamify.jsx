@@ -69,8 +69,6 @@ export function Game({state = createState(), seed = Date.now()}) {
       </button>
       <div>
         <UserStateActions
-          dispatch={dispatch}
-          gameState={gameState}
           actionList={getUserStateActions(settings)}
           onSelect={(itemSelected) => {
             const speedChange = getUserStateActionsValue({
