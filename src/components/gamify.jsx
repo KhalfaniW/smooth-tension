@@ -360,6 +360,7 @@ function setRewardAction(amount) {
   };
 }
 function setUserPointsAction(amount) {
+  console.log(amount);
   return {
     type: "SET_VARIABLE",
     property: "userActionPoints",
