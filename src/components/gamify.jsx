@@ -89,7 +89,9 @@ export function Game({state = createState(), seed = Date.now()}) {
               settings: settings,
               itemName: itemSelected,
             });
-            dispatch(setPointsAction(gameState.totalPoints + userActionValue));
+            dispatch(
+              setUserPointsAction(gameState.totalPoints + userActionValue),
+            );
           }}
         />
       </div>
@@ -355,7 +357,7 @@ function setRewardAction(amount) {
     value: amount,
   };
 }
-function setPointsAction(amount) {
+function setUserPointsAction(amount) {
   return {
     type: "SET_VARIABLE",
     property: "userActionPoints",
