@@ -296,7 +296,7 @@ function doNothing(gameState) {
 function createState() {
   let gameState = {
     ...createGameState(),
-    progressAmount: 40,
+    progressAmount: 140,
   };
 
   gameState = reduceGameState(gameState, {
