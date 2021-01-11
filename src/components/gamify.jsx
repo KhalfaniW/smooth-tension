@@ -337,11 +337,10 @@ function createState() {
 
           const shouldGiveRandomReward = randomNumberBetween1and100 > 50;
           if (shouldGiveRandomReward) {
-            newState = reduceGameState(newState, {
-              type: "SET_VARIABLE",
-              property: "initialReward",
-              value: 7,
-            });
+            newState = reduceGameState(
+              newState,
+              setUserPointsAction(gameState.userActionPoints + 3),
+            );
           }
 
           return newState;
