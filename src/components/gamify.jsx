@@ -129,7 +129,7 @@ const GameWrapper = styled.div`
 `;
 
 function createState() {
-  let state = {...createGameState(), seed: Date.now()};
+  let state = createGameState();
 
   state = reduceGameState(state, {
     type: "ADD_INTERVAL_EVENT",
