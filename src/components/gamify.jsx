@@ -141,7 +141,7 @@ function createState() {
       intervalMilliseconds:
         state.defaultIncrementInterval / state.speedMultiplier,
       runEvent: (state) => {
-        if (state.isFocusModeEnabled) {
+        if (state.isFocusModeEnabled && state.isVisible) {
           return reduceGameState(state, {
             type: "SET_VARIABLE",
             property: "progressAmount",
