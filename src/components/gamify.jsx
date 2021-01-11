@@ -57,21 +57,11 @@ export function Game({state = createState(), seed = Date.now()}) {
       >
         Start
       </button>
-      <button
-        onClick={() => {
-          dispatch({
-            type: "SET_PROGRESS_INCREMENT_SPEED",
-            speedMultiplier: 2,
-          });
-        }}
-      >
-        In active position
-      </button>
       <div>
         <UserStateActions
           actionList={getUserStateActions(settings)}
           onSelect={(itemSelected) => {
-            const speedChange = getUserStateActionsValue({
+            const speedChange = getUserStateActionValue({
               settings: settings,
               itemName: itemSelected,
             });
@@ -81,7 +71,7 @@ export function Game({state = createState(), seed = Date.now()}) {
             });
           }}
           onDeselect={(itemSelected) => {
-            const speedChange = getUserStateActionsValue({
+            const speedChange = getUserStateActionValue({
               settings: settings,
               itemName: itemSelected,
             });
@@ -91,6 +81,17 @@ export function Game({state = createState(), seed = Date.now()}) {
             });
           }}
         ></UserStateActions>
+        Block
+        <UserOneTimeActions
+          actionList={getUserOneTimeActions(settings)}
+          onComplete={(itemSelected) => {
+            const userActionValue = getUserOneTimeActionValue({
+              settings: settings,
+              itemName: itemSelected,
+            });
+            dispatch(setPointsAction(gameState.totalPoints + userActionValue));
+          }}
+        />
       </div>
       <ProgressView progressAmount={gameState.progressAmount} />
       <div>{gameState.isVisible ? "" : "Paused"}</div>
@@ -148,11 +149,47 @@ export function UserStateActions({onSelect, onDeselect, actionList}) {
     </div>
   );
 }
+export function UserOneTimeActions({onComplete, actionList}) {
+  const originalDictionary = actionList.reduce(function(dictionary, item) {
+    dictionary[item] = false;
+    return dictionary;
+  }, {});
+
+  const [isCompletedDictionary, setDictionary] = useState(originalDictionary);
+  function handleCheckboxSelect(event) {
+    const item = event.target.name;
+    const hasItemNotBeenCompleted = isCompletedDictionary[item] === false;
+    if (event.target.checked && hasItemNotBeenCompleted) {
+      onComplete(item);
+      setDictionary({...isCompletedDictionary, [item]: true});
+    }
+  }
+  return (
+    <div>
+      {actionList.map((userAction) => (
+        <FormControlLabel
+          key={userAction}
+          value="start"
+          label={userAction}
+          name={userAction}
+          control={<Checkbox color="primary" onChange={handleCheckboxSelect} />}
+        />
+      ))}
+    </div>
+  );
+}
+
 function getUserStateActions(settings) {
   return Object.keys(settings.userActionsValueDictionary.physicalState);
 }
-function getUserStateActionsValue({settings, itemName}) {
+function getUserStateActionValue({settings, itemName}) {
   return settings.userActionsValueDictionary.physicalState[itemName];
+}
+function getUserOneTimeActions(settings) {
+  return Object.keys(settings.userActionsValueDictionary.oneTimeActions);
+}
+function getUserOneTimeActionValue({settings, itemName}) {
+  return settings.userActionsValueDictionary.oneTimeActions[itemName];
 }
 
 export function ProgressView({progressAmount}) {
@@ -178,10 +215,6 @@ export function PointsShop({
       <button
         disabled={pointsRemaining === 0 || isWaitingForReward}
         onClick={() => {
-          //--1 point
-          // begin show point
-          //update seed
-          //end show point
           onSpendAPoint();
         }}
       >
@@ -199,9 +232,9 @@ function getPreviousPropertyValue({state, property}) {
   return previous;
 }
 function getComputedProperties(gameState) {
-  //minimize properties in gameState for simplicity
-  const percentOverMax = Math.max(gameState.progressAmount - 100, 0);
-  const totalPoints = Math.floor(percentOverMax / 20);
+  //minimize properties in gameState foor simplicity
+  //TODO remove becuase not calcualted
+  const totalPoints = gameState.totalPoints;
   const pointsRemaining = totalPoints - gameState.pointsUsed;
 
   const previousTotalReward = getPreviousPropertyValue({
@@ -245,17 +278,12 @@ function spendAPoint({gameState, dispatch}) {
   dispatch({
     type: "UPDATE_SEED",
   });
-  console.log({seed: gameState.seed, reward: gameState.totalReward});
 
   const rewardAddition =
     getRandomIntInclusive({min: 1, max: 100, seed: gameState.seed}) < 20
       ? 1
       : 0;
-  dispatch({
-    type: "SET_CURRENT_AND_PREVIOUS_VARIABLE",
-    property: "totalReward",
-    value: gameState.totalReward + rewardAddition,
-  });
+  dispatch(setRewardAction(gameState.totalReward + rewardAddition));
 }
 function doNothing(gameState) {
   return gameState;
@@ -263,7 +291,7 @@ function doNothing(gameState) {
 function createState() {
   let gameState = {
     ...createGameState(),
-    progressAmount: 300,
+    progressAmount: 0,
   };
 
   gameState = reduceGameState(gameState, {
@@ -318,4 +346,19 @@ function createState() {
     }),
   });
   return gameState;
+}
+
+function setRewardAction(amount) {
+  return {
+    type: "SET_CURRENT_AND_PREVIOUS_VARIABLE",
+    property: "totalReward",
+    value: amount,
+  };
+}
+function setPointsAction(amount) {
+  return {
+    type: "SET_VARIABLE",
+    property: "totalPoints",
+    value: amount,
+  };
 }
