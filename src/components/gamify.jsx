@@ -1,19 +1,10 @@
 import {Checkbox, FormControlLabel} from "@material-ui/core";
 import PageVisibility from "react-page-visibility";
 import React, {useState, useEffect} from "react";
-import ifvisible from "ifvisible.js";
 import produce from "immer";
-import {throttle} from "lodash";
 import styled from "styled-components";
 
-import {
-  addIntervalEvent,
-  addOneTimeEvent,
-  createEventWithInterval,
-  createGameState,
-  createOneTimeEvent,
-  reduceGameState,
-} from "./gamelogic";
+import {reduceGameState} from "./gamelogic";
 import {getRandomNumberInclusive} from "./random-reward";
 
 export function Game({gameState = createState(0)}) {
