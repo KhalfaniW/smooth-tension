@@ -184,7 +184,6 @@ function createState() {
       },
     }),
   });
-  console.log(state.oneTimeEvents, 4);
   return state;
 }
 export function ProgressView({progressAmount}) {
