@@ -174,8 +174,8 @@ function createState() {
           if (shouldGiveRandomReward) {
             newState = reduceGameState(newState, {
               type: "SET_VARIABLE",
-              property: "progressAmount",
-              value: state.progressAmount + 7,
+              property: "initialReward",
+              value: 7,
             });
           }
 
