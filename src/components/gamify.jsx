@@ -51,7 +51,7 @@ export function Game({gameState = createState(), seed = Date.now()}) {
     };
   };
   useEffect(setupTimeEffect, []);
-
+  const totalPoints = 4;
   return (
     <GameWrapper
       onMouseEnter={() => {
@@ -115,8 +115,8 @@ export function Game({gameState = createState(), seed = Date.now()}) {
         <>Calculating...</>
       )}
       <div>
-        {state.points.total > 0
-          ? `Points ${state.points.remaining}/${state.points.total}`
+        {totalPoints > 0
+          ? `Points ${state.points.remaining}/${totalPoints}`
           : null}{" "}
       </div>
       <button
