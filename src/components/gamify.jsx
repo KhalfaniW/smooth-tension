@@ -52,6 +52,8 @@ export function Game({gameState = createState(), seed = Date.now()}) {
   };
   useEffect(setupTimeEffect, []);
   const totalPoints = 4;
+  const pointsRemaining = totalPoints - state.pointsUsed;
+  console.assert(pointsRemaining >= 0);
   return (
     <GameWrapper
       onMouseEnter={() => {
