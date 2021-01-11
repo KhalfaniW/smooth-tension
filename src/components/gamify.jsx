@@ -124,6 +124,7 @@ export function Game({gameState = createState(), seed = Date.now()}) {
           dispatch({
             type: "SET_VARIABLE",
             property: "pointsRemaining",
+            value: state.pointsRemaining - 1,
           });
         }}
       >
