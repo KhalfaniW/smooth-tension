@@ -90,7 +90,9 @@ export function Game({state = createState(), seed = Date.now()}) {
               itemName: itemSelected,
             });
             dispatch(
-              setUserPointsAction(gameState.totalPoints + userActionValue),
+              setUserPointsAction(
+                gameState.userActionsPoints + userActionValue,
+              ),
             );
           }}
         />
