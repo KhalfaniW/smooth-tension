@@ -132,7 +132,7 @@ function createState() {
   let state = createGameState();
 
   state = addIntervalEvent(state, {
-    type: "ADD_ONE_TIME_EVENT",
+    type: "ADD_INTERVAL_EVENT",
     timeIntervalEvent: createEventWithInterval({
       id: "UPDATE_PROGRESS_ID",
       intervalMilliseconds:
