@@ -14,7 +14,7 @@ import {settings} from "./game-settings";
 
 import {getRandomIntInclusive} from "./random-reducer";
 
-export function Game({state = createState(), seed = 420}) {
+export function Game({state = createState(), seed = Date.now()}) {
   const [gameState, setState] = useState({...state, seed: seed});
 
   function dispatch(event) {
