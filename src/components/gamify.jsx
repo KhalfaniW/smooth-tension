@@ -11,7 +11,6 @@ import {
   createOneTimeEvent,
 } from "./time-reducer";
 import {createGameState, reduceGameState} from "./gamelogic";
-import {getRandomNumberInclusive} from "./random-reward";
 
 export function Game({gameState = createState(0)}) {
   const [state, setState] = useState(gameState);
