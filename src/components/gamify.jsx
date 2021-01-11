@@ -114,6 +114,11 @@ export function Game({gameState = createState(), seed = Date.now()}) {
       ) : (
         <>Calculating...</>
       )}
+      <div>
+        {state.point.total > 0
+          ? `{state.points.remaining}/{state.points.total}`
+          : null}{" "}
+      </div>
     </GameWrapper>
   );
 }
