@@ -131,9 +131,9 @@ const GameWrapper = styled.div`
 function createState() {
   let state = createGameState();
 
-  state = addIntervalEvent(
-    state,
-    createEventWithInterval({
+  state = addIntervalEvent(state, {
+    type: "ADD_ONE_TIME_EVENT",
+    timeIntervalEvent: createEventWithInterval({
       id: "UPDATE_PROGRESS_ID",
       intervalMilliseconds:
         state.defaultIncrementInterval / state.speedMultiplier,
@@ -148,7 +148,7 @@ function createState() {
         return state;
       },
     }),
-  );
+  });
   state = reduceGameState(state, {
     type: "ADD_ONE_TIME_EVENT",
     oneTimeEvent: createOneTimeEvent({
