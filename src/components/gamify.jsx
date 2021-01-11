@@ -235,8 +235,10 @@ function getPreviousPropertyValue({state, property}) {
 }
 function getComputedProperties(gameState) {
   //minimize properties in gameState for simplicity
-  //TODO remove because not calculated
-  const totalPoints = gameState.totalPoints;
+  const percentOverMax = Math.max(gameState.progressAmount - 100, 0);
+  const progressPoints = Math.floor(percentOverMax / 20);
+
+  const totalPoints = progressPoints + gameState.userActionPoints;
   const pointsRemaining = totalPoints - gameState.pointsUsed;
 
   const previousTotalReward = getPreviousPropertyValue({
