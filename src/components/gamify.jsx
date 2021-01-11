@@ -73,18 +73,20 @@ export function Game({state = createState(), seed = 420}) {
           gameState={gameState}
           actionList={getUserStateActions(settings)}
           onSelect={(itemSelected) => {
-            const speedChange = getUserStateActionsValue(settings)[
-              itemSelected
-            ];
+            const speedChange = getUserStateActionsValue({
+              settings: settings,
+              itemName: itemSelected,
+            });
             dispatch({
               type: "SET_PROGRESS_INCREMENT_SPEED",
               speedMultiplier: gameState.speedMultiplier + speedChange,
             });
           }}
           onDeselect={(itemSelected) => {
-            const speedChange = getUserStateActionsValue(settings)[
-              itemSelected
-            ];
+            const speedChange = getUserStateActionsValue({
+              settings: settings,
+              itemName: itemSelected,
+            });
             dispatch({
               type: "SET_PROGRESS_INCREMENT_SPEED",
               speedMultiplier: gameState.speedMultiplier - speedChange,
