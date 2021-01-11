@@ -232,7 +232,7 @@ function getPreviousPropertyValue({state, property}) {
   return previous;
 }
 function getComputedProperties(gameState) {
-  //minimize properties in gameState foor simplicity
+  //minimize properties in gameState for simplicity
   //TODO remove becuase not calcualted
   const totalPoints = gameState.totalPoints;
   const pointsRemaining = totalPoints - gameState.pointsUsed;
