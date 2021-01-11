@@ -133,27 +133,6 @@ const GameWrapper = styled.div`
 
 function createState() {
   let state = createGameState();
-  state = addIntervalEvent(
-    state,
-    createEventWithInterval({
-      id: "CHECK_IF_USER_HAS_LEFT_PAGE",
-      intervalMilliseconds:
-        state.defaultIncrementInterval / state.speedMultiplier,
-      runEvent: (state) => {
-        throttle(() => console.log(ifvisible.now()), 1000);
-
-        if (state.millisecondsPassed % 1000 == 0) {
-          console.log(ifvisible.now(), Date().toString());
-        }
-        if (!ifvisible.now()) {
-          // Display pop-up
-          console.log("NOT VISIBLE", Date().toString());
-        }
-
-        return state;
-      },
-    }),
-  );
 
   state = addIntervalEvent(
     state,
