@@ -136,7 +136,7 @@ export function UserStateActions({onSelect, onDeselect, actionList}) {
   }
   return (
     <div>
-      {getUserStateActions(settings).map((physicalStateForUserToBeIn) => (
+      {actionList.map((physicalStateForUserToBeIn) => (
         <FormControlLabel
           key={physicalStateForUserToBeIn}
           value="start"
