@@ -358,7 +358,7 @@ function setRewardAction(amount) {
 function setPointsAction(amount) {
   return {
     type: "SET_VARIABLE",
-    property: "totalPoints",
+    property: "userActionPoints",
     value: amount,
   };
 }
