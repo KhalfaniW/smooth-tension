@@ -7,7 +7,7 @@ import styled from "styled-components";
 import {
   addIntervalEvent,
   addOneTimeEvent,
-  createEventWithInterval,
+  createIntervalEvent,
   createOneTimeEvent,
 } from "./time-reducer";
 import {createGameState, reduceGameState} from "./gamelogic";
@@ -133,7 +133,7 @@ function createState() {
 
   state = reduceGameState(state, {
     type: "ADD_INTERVAL_EVENT",
-    timeIntervalEvent: createEventWithInterval({
+    intervalEvent: createIntervalEvent({
       id: "UPDATE_PROGRESS_ID",
       intervalMilliseconds:
         state.defaultIncrementInterval / state.speedMultiplier,

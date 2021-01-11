@@ -64,14 +64,7 @@ export default function Main() {
         <CalmPlaylist />
         <MeditationTimer isColored={true} seconds={300} />
         <RandomRewardCreator successProbabilityPercentDecimal={0.5} />
-        <TextField
-          id="standard-multiline-static"
-          label="How do you feel"
-          multiline
-          rows={4}
-        />
         <Game />
-        <WorkBreakTimer />
       </Stack>
     </>
   );
