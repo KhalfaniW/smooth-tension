@@ -7,7 +7,7 @@ import {
   createOneTimeEvent,
   timeReducer,
 } from "./time-reducer";
-import {createGameState} from "./gamelogic";
+import {createGameState} from "./game-reducer";
 
 describe("Time events ", () => {
   test("run multiple times ", () => {

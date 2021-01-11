@@ -1,13 +1,13 @@
 import produce from "immer";
 
-import { createTimerState, timeReducer } from './time-reducer';
+import {createRandomSeedState, randomReducer} from "./random-reducer";
+import {createTimerState, timeReducer} from "./time-reducer";
 
 export function reduceGameState(state, action) {
-  const stateReducedByTimer = produce(state, (draftState) => {
-    return timeReducer(state, action);
-  });
-  return produce(stateReducedByTimer, (draftState) => {
-    const oldState = stateReducedByTimer;
+  const stateWithUpdatedRandomness = randomReducer(state, action);
+  const stateReducedByTimer = timeReducer(stateWithUpdatedRandomness, action);
+  const oldState = stateReducedByTimer;
+  return produce(oldState, (draftState) => {
     switch (action.type) {
       case "SET_PROGRESS_INCREMENT_SPEED":
         let newState2 = produce(oldState, (draftState) => {
@@ -23,8 +23,14 @@ export function reduceGameState(state, action) {
           newInterval: newInterval,
         });
 
+      case "SET_CURRENT_AND_PREVIOUS_VARIABLE":
+        draftState["previous_" + action.property] = draftState[action.property];
+        draftState[action.property] = action.value;
+
+        break;
       case "SET_VARIABLE":
         draftState[action.property] = action.value;
+
         break;
       case "TOGGLE_BOOLEAN":
         draftState[action.property] = !draftState[action.property];
@@ -35,17 +41,18 @@ export function reduceGameState(state, action) {
     }
   });
 }
-export function createGameState() {
-  const defaultTimerState = createTimerState();
+export function createGameState(seed = 5) {
   return {
-    ...defaultTimerState,
+    ...createRandomSeedState(seed),
+    ...createTimerState(),
     reward: 0,
+    initialReward: 0,
     isRandomRewardChecked: false,
     progressAmount: 88,
     defaultIncrementInterval: 1000,
     incrementAmount: 0.1,
     speedMultiplier: 1,
     isVisible: true,
-    randomSeed: 5,
+    pointsUsed: 0,
   };
 }

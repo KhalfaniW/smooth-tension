@@ -45,7 +45,14 @@ export function createTimerState() {
     intervalEvents: [],
   };
 }
-
+export function getPendingEvents(state) {
+  return state.oneTimeEvents.filter((event) => {
+    return !event.isCompleted;
+  });
+}
+export function getIsEventPending({state, id}) {
+  return getPendingEvents(state).some((event) => event.id === id);
+}
 function runOneTimeEventIfScheduled(state, oneTimeEventIndex) {
   return produce(state, (draftState) => {
     const oneTimeEvent = state.oneTimeEvents[oneTimeEventIndex];

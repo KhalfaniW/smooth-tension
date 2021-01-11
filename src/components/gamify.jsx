@@ -1,59 +1,40 @@
 import {Checkbox, FormControlLabel} from "@material-ui/core";
-import PageVisibility from "react-page-visibility";
 import React, {useState, useEffect} from "react";
 import produce from "immer";
 import styled from "styled-components";
 
+import {createGameState, reduceGameState} from "./game-reducer";
 import {
-  addIntervalEvent,
-  addOneTimeEvent,
   createIntervalEvent,
   createOneTimeEvent,
+  getIsEventPending,
 } from "./time-reducer";
-import {createGameState, reduceGameState} from "./game-reducer";
 import {getRandomIntInclusive} from "./random-reducer";
+import {userActionsValueDictionary} from "./game-config";
 
-export function Game({gameState = createState(), seed = Date.now()}) {
-  const [state, setState] = useState({...gameState, seed: 5});
+export function Game({state = createState(), seed = Date.now()}) {
+  const [gameState, setState] = useState({...state, seed: 5});
 
   function dispatch(event) {
-    setState((state) => reduceGameState(state, event));
+    setState((gameState) => reduceGameState(gameState, event));
   }
-  function handleCheckboxSelect(event) {
-    switch (event.target.name) {
-      case "checkBox_toggleIsActive":
-        const speedChange = event.target.checked ? 1 : -1;
-        const newSpeed = state.speedMultiplier + speedChange;
-
-        if (event.target.checkbox) {
-          dispatch({
-            type: "SET_PROGRESS_INCREMENT_SPEED",
-            speedMultiplier: newSpeed,
-          });
-        } else {
-          dispatch({
-            type: "SET_PROGRESS_INCREMENT_SPEED",
-            speedMultiplier: newSpeed,
-          });
-        }
-
-        break;
-      default:
-    }
-  }
-
   const setupTimeEffect = () => {
     const timer = setInterval(() => {
       dispatch({type: "HANDLE_TIME_TICK"});
-    }, state.millisecondsPerTick);
+    }, gameState.millisecondsPerTick);
     return () => {
       clearInterval(timer);
     };
   };
   useEffect(setupTimeEffect, []);
-  const totalPoints = 4;
-  const pointsRemaining = totalPoints - state.pointsUsed;
-  console.assert(pointsRemaining >= 0);
+
+  const {
+    totalPoints,
+    pointsRemaining,
+    isWaitingForReward,
+    previousReward,
+  } = getComputedProperties(gameState);
+
   return (
     <GameWrapper
       onMouseEnter={() => {
@@ -71,16 +52,7 @@ export function Game({gameState = createState(), seed = Date.now()}) {
         });
       }}
     >
-      Keep Mouse in area
-      <PageVisibility
-        onChange={(isVisible) => {
-          /* dispatch({ */
-          /*   type: "SET_VARIABLE", */
-          /*   property: "isVisible", */
-          /*   value: isVisible, */
-          /* }); */
-        }}
-      ></PageVisibility>
+      Keep Mouse in this area
       <button
         onClick={() => {
           dispatch({type: "TOGGLE_BOOLEAN", property: "isFocusModeEnabled"});
@@ -99,35 +71,39 @@ export function Game({gameState = createState(), seed = Date.now()}) {
         In active position
       </button>
       <div>
-        <FormControlLabel
-          value="start"
-          label="Sitting in an active position"
-          name="checkBox_toggleIsActive"
-          control={<Checkbox color="primary" onChange={handleCheckboxSelect} />}
-        />
+        <UserStateActions
+          dispatch={dispatch}
+          gameState={gameState}
+        ></UserStateActions>
       </div>
-      <ProgressView progressAmount={state.progressAmount} />
-      <div>
-        {state.isVisible.toString()}Speed: {state.speedMultiplier}
-      </div>
-      <div>{state.isFocusModeEnabled ? "focused" : null} </div>
-      {state.isRandomRewardChecked ? (
-        <div>Reward: {state.initialReward}</div>
+      <ProgressView progressAmount={gameState.progressAmount} />
+      <div>{gameState.isVisible ? "" : "Paused"}</div>
+      <div>Speed: {gameState.speedMultiplier}</div>
+      <div>{gameState.isFocusModeEnabled ? "focused" : null} </div>
+      {gameState.isRandomRewardChecked ? (
+        <div>Reward: {gameState.initialReward}</div>
       ) : (
         <>Calculating...</>
       )}
       <div>
-        {totalPoints > 0
-          ? `Points ${state.pointsRemaining}/${totalPoints}`
-          : null}{" "}
+        {totalPoints > 0 ? `Points ${pointsRemaining}/${totalPoints}` : null}{" "}
+      </div>
+      <div>
+        {isWaitingForReward
+          ? `Calculating progress Addendum`
+          : `Total ${
+              gameState.reward
+            } ${previousReward} most recent ${gameState.reward -
+              previousReward}`}
       </div>
       <button
+        disabled={pointsRemaining === 0 || isWaitingForReward}
         onClick={() => {
-          dispatch({
-            type: "SET_VARIABLE",
-            property: "pointsRemaining",
-            value: state.pointsRemaining - 1,
-          });
+          //--1 point
+          // begin show point
+          //update seed
+          //end show point
+          spendAPoint({dispatch: dispatch, gameState: gameState});
         }}
       >
         Use Point
@@ -145,36 +121,125 @@ const GameWrapper = styled.div`
   color: #444;
   border: 1px solid #1890ff;
 `;
+export function UserStateActions({dispatch, gameState}) {
+  function handleCheckboxSelect(event) {
+    const speedValue =
+      userActionsValueDictionary.physicalState[event.target.name];
 
+    const speedChange = event.target.checked ? speedValue : -speedValue;
+    const newSpeed = gameState.speedMultiplier + speedChange;
+    dispatch({
+      type: "SET_PROGRESS_INCREMENT_SPEED",
+      speedMultiplier: newSpeed,
+    });
+  }
+
+  return (
+    <div>
+      {Object.keys(userActionsValueDictionary.physicalState).map(
+        (physicalStateForUserToBeIn) => (
+          <FormControlLabel
+            key={physicalStateForUserToBeIn}
+            value="start"
+            label={physicalStateForUserToBeIn}
+            name={physicalStateForUserToBeIn}
+            control={
+              <Checkbox color="primary" onChange={handleCheckboxSelect} />
+            }
+          />
+        ),
+      )}
+    </div>
+  );
+}
+
+export function ProgressView({progressAmount}) {
+  return <div>Progress {progressAmount.toFixed(1)}%</div>;
+}
+
+function getComputedProperties(gameState) {
+  //minimize properties in gameState for simplicity
+  const percentOverMax = Math.max(gameState.progressAmount - 100, 0);
+  const totalPoints = Math.floor(percentOverMax / 20);
+  const pointsRemaining = totalPoints - gameState.pointsUsed;
+
+  const previousReward = gameState.previous_reward
+    ? gameState.previous_reward
+    : 0;
+
+  const isWaitingForReward = getIsEventPending({
+    state: gameState,
+    id: "WAIT_TO_SHOW_REWARD_ID",
+  });
+  if (pointsRemaining < 0) {
+    throw new Error("Used more points then available");
+  }
+  return {totalPoints, pointsRemaining, isWaitingForReward, previousReward};
+}
+function spendAPoint({gameState, dispatch}) {
+  dispatch({
+    type: "ADD_ONE_TIME_EVENT",
+    oneTimeEvent: createOneTimeEvent({
+      id: "WAIT_TO_SHOW_REWARD_ID",
+      runTime: gameState.millisecondsPassed + 1000,
+      runEvent: (gameState) => {
+        return produce(gameState, (draftState) => doNothing(gameState));
+      },
+    }),
+  });
+  dispatch({
+    type: "SET_VARIABLE",
+    property: "pointsUsed",
+    value: gameState.pointsUsed + 1,
+  });
+
+  dispatch({
+    type: "UPDATE_SEED",
+  });
+
+  dispatch({
+    type: "SET_CURRENT_AND_PREVIOUS_VARIABLE",
+    property: "reward",
+    value:
+      gameState.reward +
+      getRandomIntInclusive({min: 0, max: 5, seed: gameState.seed}),
+  });
+}
+function doNothing(gameState) {
+  return gameState;
+}
 function createState() {
-  let state = createGameState();
+  let gameState = {
+    ...createGameState(),
+    progressAmount: 120,
+  };
 
-  state = reduceGameState(state, {
+  gameState = reduceGameState(gameState, {
     type: "ADD_INTERVAL_EVENT",
     intervalEvent: createIntervalEvent({
       id: "UPDATE_PROGRESS_ID",
       intervalMilliseconds:
-        state.defaultIncrementInterval / state.speedMultiplier,
-      runEvent: (state) => {
-        if (state.isFocusModeEnabled && state.isVisible) {
-          return reduceGameState(state, {
+        gameState.defaultIncrementInterval / gameState.speedMultiplier,
+      runEvent: (gameState) => {
+        if (gameState.isFocusModeEnabled && gameState.isVisible) {
+          return reduceGameState(gameState, {
             type: "SET_VARIABLE",
             property: "progressAmount",
-            value: state.progressAmount + state.incrementAmount,
+            value: gameState.progressAmount + gameState.incrementAmount,
           });
         }
-        return state;
+        return gameState;
       },
     }),
   });
-  state = reduceGameState(state, {
+  gameState = reduceGameState(gameState, {
     type: "ADD_ONE_TIME_EVENT",
     oneTimeEvent: createOneTimeEvent({
       id: "SHOW_DELAYED_REWARD_ID",
       runTime: 1000,
-      runEvent: (state) => {
-        return produce(state, (draftState) => {
-          let newState = reduceGameState(state, {
+      runEvent: (gameState) => {
+        return produce(gameState, (draftState) => {
+          let newState = reduceGameState(gameState, {
             type: "SET_VARIABLE",
             property: "isRandomRewardChecked",
             value: true,
@@ -183,7 +248,7 @@ function createState() {
           const randomNumberBetween1and100 = getRandomIntInclusive({
             min: 1,
             max: 100,
-            seed: state.randomSeed,
+            seed: gameState.randomSeed,
           });
 
           const shouldGiveRandomReward = randomNumberBetween1and100 > 50;
@@ -200,8 +265,5 @@ function createState() {
       },
     }),
   });
-  return state;
-}
-export function ProgressView({progressAmount}) {
-  return <div>progressAmount {progressAmount.toFixed(1)}%</div>;
+  return gameState;
 }
