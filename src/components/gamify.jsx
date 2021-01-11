@@ -173,6 +173,7 @@ export function UserOneTimeActions({onComplete, actionList}) {
           key={userAction}
           value="start"
           label={userAction}
+          disabled={isCompletedDictionary[userAction]}
           name={userAction}
           control={<Checkbox color="primary" onChange={handleCheckboxSelect} />}
         />
