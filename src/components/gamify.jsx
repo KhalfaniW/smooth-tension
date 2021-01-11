@@ -10,7 +10,8 @@ import {
   createIntervalEvent,
   createOneTimeEvent,
 } from "./time-reducer";
-import {createGameState, reduceGameState} from "./gamelogic";
+import {createGameState, reduceGameState} from "./game-reducer";
+import { getRandomIntInclusive } from './random-reducer';
 
 export function Game({gameState = createState(0)}) {
   const [state, setState] = useState(gameState);
@@ -128,7 +129,8 @@ const GameWrapper = styled.div`
 `;
 
 function createState() {
-  let state = createGameState();
+    let state = { ...createGameState(),
+                  seed = Date.now()};
 
   state = reduceGameState(state, {
     type: "ADD_INTERVAL_EVENT",
@@ -161,7 +163,7 @@ function createState() {
             value: true,
           });
 
-          const randomNumberBetween1and100 = getRandomNumberInclusive({
+          const randomNumberBetween1and100 = getRandomIntInclusive({
             min: 1,
             max: 100,
             seed: state.randomSeed,
