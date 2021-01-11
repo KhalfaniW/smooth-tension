@@ -4,7 +4,13 @@ import React, {useState, useEffect} from "react";
 import produce from "immer";
 import styled from "styled-components";
 
-import {reduceGameState} from "./gamelogic";
+import {
+  addIntervalEvent,
+  addOneTimeEvent,
+  createEventWithInterval,
+  createOneTimeEvent,
+} from "./time-reducer";
+import {createGameState, reduceGameState} from "./gamelogic";
 import {getRandomNumberInclusive} from "./random-reward";
 
 export function Game({gameState = createState(0)}) {
@@ -143,9 +149,9 @@ function createState() {
       },
     }),
   );
-  state = addOneTimeEvent(
-    state,
-    createOneTimeEvent({
+  state = reduceGameState(state, {
+    type: "ADD_ONE_TIME_EVENT",
+    oneTimeEvent: createOneTimeEvent({
       id: "SHOW_DELAYED_REWARD_ID",
       runTime: 1000,
       runEvent: (state) => {
@@ -175,7 +181,7 @@ function createState() {
         });
       },
     }),
-  );
+  });
   return state;
 }
 export function ProgressView({progressAmount}) {
