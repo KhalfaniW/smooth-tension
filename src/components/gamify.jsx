@@ -134,7 +134,6 @@ export function UserStateActions({onSelect, onDeselect, actionList}) {
       onDeselect(event.target.name);
     }
   }
-
   return (
     <div>
       {getUserStateActions(settings).map((physicalStateForUserToBeIn) => (
