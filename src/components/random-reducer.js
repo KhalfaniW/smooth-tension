@@ -6,7 +6,7 @@ export function randomReducer(state, action) {
   return produce(state, (draftState) => {
     switch (action.type) {
       case "UPDATE_SEED":
-        draftState.seed = seedrandom(draftState.seed);
+        draftState.seed = seedrandom(draftState.seed)();
         return draftState;
       default:
         return state;

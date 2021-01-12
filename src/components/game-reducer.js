@@ -45,10 +45,11 @@ export function createGameState(seed = 5) {
   return {
     ...createRandomSeedState(seed),
     ...createTimerState(),
-    reward: 0,
+    totalReward: 0,
+    userActionPoints: 0,
     initialReward: 0,
     isRandomRewardChecked: false,
-    progressAmount: 88,
+    progressAmount: 0,
     defaultIncrementInterval: 1000,
     incrementAmount: 0.1,
     speedMultiplier: 1,
