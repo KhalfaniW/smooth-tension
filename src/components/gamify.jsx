@@ -57,6 +57,10 @@ export function Game({state = createState(), seed = Date.now()}) {
       >
         Start
       </button>
+      <ProgressView progressAmount={gameState.progressAmount} />
+      <div>{gameState.isVisible ? "" : "Paused"}</div>
+      <div>Speed: {gameState.speedMultiplier}</div>
+      <div>{gameState.isFocusModeEnabled ? "focused" : null} </div>
       <div>
         <UserStateActions
           actionList={getUserStateActions(settings)}
@@ -95,10 +99,6 @@ export function Game({state = createState(), seed = Date.now()}) {
           }}
         />
       </div>
-      <ProgressView progressAmount={gameState.progressAmount} />
-      <div>{gameState.isVisible ? "" : "Paused"}</div>
-      <div>Speed: {gameState.speedMultiplier}</div>
-      <div>{gameState.isFocusModeEnabled ? "focused" : null} </div>
       {gameState.isRandomRewardChecked ? (
         <div>Reward: {gameState.userActionPoints}</div>
       ) : (
