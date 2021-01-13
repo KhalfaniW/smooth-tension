@@ -90,7 +90,7 @@ export function Game({state = createState(), seed = Date.now()}) {
           actionList={getUserOneTimeActions(gameState.currentSettings)}
           onComplete={(itemSelected) => {
             const userActionValue = getUserOneTimeActionValue({
-              settings: settings,
+              settings: gameState.currentSettings,
               itemName: itemSelected,
             });
             dispatch(
