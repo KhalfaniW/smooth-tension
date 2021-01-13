@@ -173,7 +173,9 @@ export function UserOneTimeActions({onComplete, actionList}) {
     return dictionary;
   }, {});
 
-  const [isCompletedDictionary, setDictionary] = useState(originalDictionary);
+  const [isCompletedDictionary, setDictionary] = useState({
+    ...originalDictionary,
+  });
   function handleCheckboxSelect(event) {
     const item = event.target.name;
     const hasItemNotBeenCompleted = isCompletedDictionary[item] === false;
