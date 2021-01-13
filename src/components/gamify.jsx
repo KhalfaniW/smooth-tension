@@ -26,7 +26,7 @@ export function Game({state = createState(), seed = Date.now()}) {
       clearInterval(timer);
     };
   };
-  useEffect(setupTimeEffect, []);
+  useEffect(setupTimeEffect, [gameState.millisecondsPerTick]);
   const allComputedProperties = getComputedProperties(gameState);
   const {totalPoints, pointsRemaining} = allComputedProperties;
 
