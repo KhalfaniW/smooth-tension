@@ -102,7 +102,7 @@ export function Game({state = createState(), seed = Date.now()}) {
         ></UserStateActions>
         Block
         <UserOneTimeActions
-          actionList={getUserOneTimeActions(gameState.currentSettings)}
+          actionList={getUserOneTimeActions(gameState)}
           onComplete={(itemSelected) => {
             const userActionValue = getUserOneTimeActionValue({
               state: gameState,
