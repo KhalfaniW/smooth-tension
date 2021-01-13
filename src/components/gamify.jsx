@@ -57,6 +57,7 @@ export function Game({state = createState(), seed = Date.now()}) {
       >
         Start
       </button>
+      <div>Note how feel</div>
       <ProgressView progressAmount={gameState.progressAmount} />
       <div>{gameState.isVisible ? "" : "Paused"}</div>
       <div>Speed: {gameState.speedMultiplier}</div>
