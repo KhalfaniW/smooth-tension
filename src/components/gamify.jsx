@@ -78,7 +78,7 @@ export function Game({state = createState(), seed = Date.now()}) {
       <div>{gameState.isFocusModeEnabled ? "focused" : null} </div>
       <div>
         <UserStateActions
-          actionList={getUserStateActions(gameState.currentSettings)}
+          actionList={getUserStateActions(gameState)}
           onSelect={(itemSelected) => {
             const speedChange = getUserStateActionValue({
               state: gameState,
