@@ -63,8 +63,8 @@ export function Game({state = createState(), seed = Date.now()}) {
         onClick={() => {
           dispatch({
             type: "SET_VARIABLE",
-            property: "isFocusModeEnabled",
-            value: true,
+            property: "currentSettings",
+            value: resistingSettings,
           });
         }}
       >
