@@ -1,4 +1,4 @@
-import {Checkbox, FormControlLabel} from "@material-ui/core";
+import {Checkbox, FormControlLabel, TextField} from "@material-ui/core";
 import React, {useState, useEffect} from "react";
 import produce from "immer";
 import styled from "styled-components";
@@ -9,10 +9,8 @@ import {
   createOneTimeEvent,
   getIsEventPending,
 } from "./time-reducer";
-
-import {settings} from "./game-settings";
-
 import {getRandomIntInclusive} from "./random-reducer";
+import {settings} from "./game-settings";
 
 export function Game({state = createState(), seed = Date.now()}) {
   const [gameState, setState] = useState({...state, seed: seed});
@@ -298,6 +296,7 @@ function doNothing(gameState) {
 function createState() {
   let gameState = {
     ...createGameState(),
+    currentSettting: {...settings},
     progressAmount: 0,
   };
 
