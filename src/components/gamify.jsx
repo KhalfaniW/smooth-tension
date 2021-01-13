@@ -62,7 +62,7 @@ export function Game({state = createState(), seed = Date.now()}) {
       <button
         onClick={() => {
           dispatch({
-            type: "SET_VARIABLE",
+            type: "SET_OBJECT",
             property: "currentSettings",
             value: resistingSettings,
           });
