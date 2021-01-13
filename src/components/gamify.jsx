@@ -50,10 +50,25 @@ export function Game({state = createState(), seed = Date.now()}) {
       Keep Mouse in this area
       <button
         onClick={() => {
-          dispatch({type: "TOGGLE_BOOLEAN", property: "isFocusModeEnabled"});
+          dispatch({
+            type: "SET_VARIABLE",
+            property: "isFocusModeEnabled",
+            value: true,
+          });
         }}
       >
         Start
+      </button>
+      <button
+        onClick={() => {
+          dispatch({
+            type: "SET_VARIABLE",
+            property: "isFocusModeEnabled",
+            value: true,
+          });
+        }}
+      >
+        Tempted
       </button>
       <div>Note how feel</div>
       <TextField id="outlined-basic" label="Outlined" variant="outlined" />
