@@ -64,7 +64,7 @@ export function Game({state = createState(), seed = Date.now()}) {
           dispatch({
             type: "SET_OBJECT",
             property: "currentSettings",
-            value: {...resistingSettings},
+            value: resistingSettings,
           });
         }}
       >
