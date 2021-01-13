@@ -168,13 +168,12 @@ export function UserStateActions({onSelect, onDeselect, actionList}) {
   );
 }
 export function UserOneTimeActions({onComplete, actionList}) {
-  const [isCompletedDictionary, setDictionary] = useState(
-    actionList.reduce(function(dictionary, item) {
-      dictionary[item] = false;
-      return dictionary;
-    }, {}),
-  );
+  const originalDictionary = actionList.reduce(function(dictionary, item) {
+    dictionary[item] = false;
+    return dictionary;
+  }, {});
 
+  const [isCompletedDictionary, setDictionary] = useState(originalDictionary);
   function handleCheckboxSelect(event) {
     const item = event.target.name;
     const hasItemNotBeenCompleted = isCompletedDictionary[item] === false;
