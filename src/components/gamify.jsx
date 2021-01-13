@@ -177,12 +177,14 @@ export function UserOneTimeActions({onComplete, actionList}) {
   function handleCheckboxSelect(event) {
     const item = event.target.name;
     const hasItemNotBeenCompleted = isCompletedDictionary[item] === false;
+    console.log(isCompletedDictionary);
+    console.log(actionList);
+
     if (event.target.checked && hasItemNotBeenCompleted) {
       onComplete(item);
       setDictionary({...isCompletedDictionary, [item]: true});
     }
   }
-  console.log(actionList);
   return (
     <div>
       {actionList.map((userAction) => (
