@@ -91,7 +91,7 @@ export function Game({state = createState(), seed = Date.now()}) {
           }}
           onDeselect={(itemSelected) => {
             const speedChange = getUserStateActionValue({
-              state: gameStategs,
+              state: gameState,
               itemName: itemSelected,
             });
             dispatch({
