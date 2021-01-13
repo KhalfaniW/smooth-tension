@@ -182,7 +182,9 @@ export function UserOneTimeActions({onComplete, actionList}) {
 
     if (event.target.checked && hasItemNotBeenCompleted) {
       onComplete(item);
-      setDictionary(isCompletedDictionary=>{...isCompletedDictionary, [item]: true});
+      setDictionary((isCompletedDictionary) => {
+        return {...isCompletedDictionary, [item]: true};
+      });
     }
   }
   return (
