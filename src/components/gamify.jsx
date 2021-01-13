@@ -10,7 +10,7 @@ import {
   getIsEventPending,
 } from "./time-reducer";
 import {getRandomIntInclusive} from "./random-reducer";
-import {settings} from "./game-settings";
+import {settings, resistingSettings} from "./game-settings";
 
 export function Game({state = createState(), seed = Date.now()}) {
   const [gameState, setState] = useState({...state, seed: seed});
