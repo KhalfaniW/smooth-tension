@@ -185,6 +185,7 @@ export function UserOneTimeActions({onComplete, actionList}) {
 function getUserStateActions(settings) {
   return Object.keys(settings.userActionsValueDictionary.physicalState);
 }
+
 function getUserStateActionValue({settings, itemName}) {
   return settings.userActionsValueDictionary.physicalState[itemName];
 }
