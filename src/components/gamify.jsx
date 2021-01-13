@@ -81,7 +81,7 @@ export function Game({state = createState(), seed = Date.now()}) {
           actionList={getUserStateActions(gameState.currentSettings)}
           onSelect={(itemSelected) => {
             const speedChange = getUserStateActionValue({
-              settings: gameState.currentSettings,
+              state: gameState,
               itemName: itemSelected,
             });
             dispatch({
@@ -91,7 +91,7 @@ export function Game({state = createState(), seed = Date.now()}) {
           }}
           onDeselect={(itemSelected) => {
             const speedChange = getUserStateActionValue({
-              settings: gameState.currentSettings,
+              state: gameState.currentSettings,
               itemName: itemSelected,
             });
             dispatch({
@@ -105,7 +105,7 @@ export function Game({state = createState(), seed = Date.now()}) {
           actionList={getUserOneTimeActions(gameState.currentSettings)}
           onComplete={(itemSelected) => {
             const userActionValue = getUserOneTimeActionValue({
-              settings: gameState.currentSettings,
+              state: gameState,
               itemName: itemSelected,
             });
             dispatch(
