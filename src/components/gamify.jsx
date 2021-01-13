@@ -197,18 +197,26 @@ export function UserOneTimeActions({onComplete, actionList}) {
   );
 }
 
-function getUserStateActions(settings) {
-  return Object.keys(settings.userActionsValueDictionary.physicalState);
+function getUserStateActions(state) {
+  return Object.keys(
+    state.currentSettings.userActionsValueDictionary.physicalState,
+  );
 }
 
-function getUserStateActionValue({settings, itemName}) {
-  return settings.userActionsValueDictionary.physicalState[itemName];
+function getUserStateActionValue({state, itemName}) {
+  return state.currentSettings.userActionsValueDictionary.physicalState[
+    itemName
+  ];
 }
-function getUserOneTimeActions(settings) {
-  return Object.keys(settings.userActionsValueDictionary.oneTimeActions);
+function getUserOneTimeActions(state) {
+  return Object.keys(
+    state.currentSettings.userActionsValueDictionary.oneTimeActions,
+  );
 }
-function getUserOneTimeActionValue({settings, itemName}) {
-  return settings.userActionsValueDictionary.oneTimeActions[itemName];
+function getUserOneTimeActionValue({state, itemName}) {
+  return state.currentSettings.userActionsValueDictionary.oneTimeActions[
+    itemName
+  ];
 }
 
 export function ProgressView({progressAmount}) {
