@@ -182,6 +182,7 @@ export function UserOneTimeActions({onComplete, actionList}) {
       setDictionary({...isCompletedDictionary, [item]: true});
     }
   }
+  console.log(actionList);
   return (
     <div>
       {actionList.map((userAction) => (
