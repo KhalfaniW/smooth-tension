@@ -108,8 +108,6 @@ export function Game({state = createState(), seed = Date.now()}) {
               state: gameState,
               itemName: itemSelected,
             });
-            console.log(itemSelected);
-            console.log(userActionValue);
 
             dispatch(
               setUserPointsAction(gameState.userActionPoints + userActionValue),
