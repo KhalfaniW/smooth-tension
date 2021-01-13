@@ -296,7 +296,7 @@ function doNothing(gameState) {
 function createState() {
   let gameState = {
     ...createGameState(),
-    currentSettting: {...settings},
+    currentSetttings: {...settings},
     progressAmount: 0,
   };
 
