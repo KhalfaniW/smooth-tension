@@ -7,7 +7,7 @@ export function timeReducer(state, action) {
     let newState;
     switch (action.type) {
       case "HANDLE_UNRELIABLE_TIME_TICK":
-        //setInterval ticks may be skipped; simulate them if missed
+        //setInterval ticks may be skipped some times
         newState = produce(state, (draftState) => {
           draftState;
         });
