@@ -9,7 +9,7 @@ export function timeReducer(state, action) {
       case "HANDLE_UNRELIABLE_TIME_TICK":
         //setInterval ticks may be skipped some times
         newState = produce(state, (draftState) => {
-          return draftState;
+          return;
         });
 
         newState = timeReducer(newState, {
