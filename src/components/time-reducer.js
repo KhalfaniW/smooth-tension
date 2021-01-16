@@ -13,9 +13,9 @@ export function timeReducer(state, action) {
           draftState.millisecondsPassed += draftState.millisecondsPerTick;
         });
 
-        for (var i = 0; i < draftState.intervalEvents.length; i++) {
+        times(draftState.intervalEvents.length, () => {
           newState = runIntervalEventIfScheduled(newState, i);
-        }
+        });
 
         for (i = 0; i < draftState.oneTimeEvents.length; i++) {
           newState = runOneTimeEventIfScheduled(newState, i);
