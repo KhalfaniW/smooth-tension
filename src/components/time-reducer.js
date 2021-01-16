@@ -39,7 +39,7 @@ export function timeReducer(state, action) {
         const skippedTicks = getSkippedTicks({
           currentTime: action.timeSinceEpochMS,
           previousTime: draftState.timeSinceEpochMS,
-          interval: draftState.millisecondsPassed,
+          interval: draftState.millisecondsPerTick,
         });
 
         newState = produce(state, (draftState) => {
