@@ -43,13 +43,13 @@ export function timeReducer(state, action) {
           interval: draftState.millisecondsPassed,
         });
 
-        for (i = 0; i < skippedTicks; i++) {
-          newState = timeReducer(newState, {type: "HANDLE_TIME_TICK"});
-        }
         newState = produce(state, (draftState) => {
           draftState.timeSinceEpochMS = action.timeSinceEpochMS;
         });
 
+        for (i = 0; i < skippedTicks; i++) {
+          newState = timeReducer(newState, {type: "HANDLE_TIME_TICK"});
+        }
         return newState;
 
       case "SET_EVENT_INTERVAL":
