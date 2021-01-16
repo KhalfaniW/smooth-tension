@@ -29,6 +29,7 @@ export function timeReducer(state, action) {
           interval: draftState.millisecondsPassed,
         });
 
+        //immer drafts needs to be copied becuase they cannot be reassigned
         newState = produce(state, (draftState) => {
           draftState.timeSinceEpochMS = action.timeSinceEpochMS;
         });
@@ -37,14 +38,6 @@ export function timeReducer(state, action) {
           newState = timeReducer(newState, {type: "HANDLE_TIME_TICK"});
         });
 
-        for (var i = 0; i < draftState.intervalEvents.length; i++) {
-          //immer drafts needs to be copied becuase they cannot be reassigned
-          newState = runIntervalEventIfScheduled(newState, i);
-        }
-
-        for (i = 0; i < draftState.oneTimeEvents.length; i++) {
-          newState = runOneTimeEventIfScheduled(newState, i);
-        }
         return newState;
 
       case "SET_EVENT_INTERVAL":
