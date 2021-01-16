@@ -15,24 +15,23 @@ import {getRandomIntInclusive} from "./random-reducer";
 import {settings, resistingSettings} from "./game-settings";
 
 export function Game({state = createState(), seed = Date.now()}) {
-  const [gameState, setState] = useState({...state, seed: seed});
+  const [gameState, setState] = useState({
+    ...state,
+    seed: seed,
+    millisecondsPerTick: 500,
+  });
 
   function dispatch(event) {
     setState((gameState) => reduceGameState(gameState, event));
   }
   const setupTimeEffect = () => {
-    // const timer = setInterval(() => {
-    //   dispatch({
-    //     type: "HANDLE_UNRELIABLE_TIME_TICK",
-    //     timeSinceEpochMS: Date.now(),
-    //   });
-    // }, gameState.millisecondsPerTick);
-
     const timer = setInterval(() => {
       dispatch({
-        type: "HANDLE_TIME_TICK",
+        type: "HANDLE_UNRELIABLE_TIME_TICK",
+        timeSinceEpochMS: Date.now(),
       });
-    }, 500);
+    }, gameState.millisecondsPerTick);
+
     return () => {
       clearInterval(timer);
     };
