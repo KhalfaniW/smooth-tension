@@ -39,7 +39,7 @@ export function timeReducer(state, action) {
         const skippedTicks = getSkippedTicks({
           currentTime: action.timeSinceEpochMS,
           previousTime: draftState.timeSinceEpochMS,
-          interval: draftState.millisecondsPerTick,
+          tickInterval: draftState.millisecondsPerTick,
         });
 
         newState = produce(state, (draftState) => {
@@ -92,13 +92,13 @@ export function getIsEventPending({state, id}) {
   return getPendingEvents(state).some((event) => event.id === id);
 }
 export function getSkippedTicks({currentTime, previousTime, tickInterval}) {
-  if (interval === 0) {
-    throw Error("Interval must be greater than 0");
+  if (tickInterval === 0) {
+    throw Error("ticki interval must be greater than 0");
   }
   const skippedTime = currentTime - previousTime;
-  const shouldTickNow = skippedTime % interval === 0;
+  const shouldTickNow = skippedTime % tickInterval === 0;
 
-  const totalTicks = Math.floor(skippedTime / interval);
+  const totalTicks = Math.floor(skippedTime / tickInterval);
   const skippedTicks = shouldTickNow ? totalTicks - 1 : totalTicks;
 
   return skippedTicks;
