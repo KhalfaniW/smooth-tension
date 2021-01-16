@@ -30,8 +30,11 @@ export function reduceGameState(state, action) {
         break;
       case "SET_VARIABLE":
         draftState[action.property] = action.value;
-
         break;
+      case "SET_OBJECT": //TODO remov
+        draftState[action.property] = action.value;
+        break;
+
       case "TOGGLE_BOOLEAN":
         draftState[action.property] = !draftState[action.property];
         break;

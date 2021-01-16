@@ -20,3 +20,19 @@ export const settings = {
     },
   },
 };
+
+export const resistingSettings = {
+  userActionsValueDictionary: {
+    oneTimeActions: {
+      "Remember that this feeling will pass": giveFixedPoints(2),
+      "Breath 30 seconds": giveFixedPoints(0.2),
+      "Remember what is important": giveFixedPoints(0.5),
+      "Block site temp": giveFixedPoints(1),
+      "Try waiting for 10 min": giveFixedPoints(1),
+      "Close distracting website": giveFixedPoints(0.5),
+    },
+    physicalState: {
+      "Breath Exersie": changeSpeed(1),
+    },
+  },
+};
