@@ -138,7 +138,7 @@ export function getExtraTicks({currentTime, previousTime, tickInterval}) {
   });
   return Math.max(ticksNeeded, 0);
 }
-export function getTicksNeededToRecalibrate({
+function getTicksNeededToRecalibrate({
   currentTime,
 
   tickInterval,
