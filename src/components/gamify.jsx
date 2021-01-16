@@ -18,7 +18,7 @@ export function Game({state = createState(), seed = Date.now()}) {
   const [gameState, setState] = useState({
     ...state,
     seed: seed,
-    millisecondsPerTick: 1,
+    millisecondsPerTick: 490,
 
     timeSinceEpochMS: Date.now(),
   });
