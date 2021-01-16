@@ -59,10 +59,8 @@ export function timeReducer(state, action) {
           draftState.timeSinceEpochMS = action.timeSinceEpochMS;
         });
         getExtraTicks({
-          currentTime: action.timeSinceEpochMS,
-          tickInterval,
-          startTime,
-          expectedTimePassed,
+          realTime: action.timeSinceEpochMS,
+          timerState: state,
         });
         const realTimePassed = -state.startTime;
         const incorrectTimeDifference =
