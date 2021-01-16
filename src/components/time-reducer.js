@@ -120,11 +120,19 @@ export function getSkippedTicks({currentTime, previousTime, tickInterval}) {
   const shouldTickNow = skippedTime % tickInterval === 0;
 
   const totalTicks = Math.floor(skippedTime / tickInterval);
-  const skippedTicks = shouldTickNow ? totalTicks - 3 : totalTicks;
+  const skippedTicks = shouldTickNow ? totalTicks - 2 : totalTicks;
 
   return skippedTicks < 0 ? 0 : skippedTicks;
 }
 
+export function getExtraTicks({currentTime, previousTime, tickInterval}) {
+  const ticksNeeded = getTicksNeededToRecalibrate({
+    currentTime,
+    previousTime,
+    tickInterval,
+  });
+  return Math.max(ticksNeeded, 0);
+}
 // export function getTicksNeededToRecalibrate({
 //   currentTime,
 //   previousTime,
