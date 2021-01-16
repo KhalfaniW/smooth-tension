@@ -24,7 +24,7 @@ export function Game({state = createState(), seed = Date.now()}) {
     const timer = setInterval(() => {
       dispatch({
         type: "HANDLE_UNRELIABLE_TIME_TICK",
-        timeSinceEpochMS: 5,
+        timeSinceEpochMS: Date.now(),
       });
     }, gameState.millisecondsPerTick);
     return () => {
