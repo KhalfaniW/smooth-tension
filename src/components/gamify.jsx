@@ -19,6 +19,7 @@ export function Game({state = createState(), seed = Date.now()}) {
     ...state,
     seed: seed,
     timeSinceEpochMS: Date.now(),
+    startTime: Date.now(),
   });
 
   function dispatch(event) {
