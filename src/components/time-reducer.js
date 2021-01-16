@@ -123,7 +123,7 @@ export function getSkippedTicks({currentTime, previousTime, tickInterval}) {
   const totalTicks = Math.floor(skippedTime / tickInterval);
   const skippedTicks = shouldTickNow ? totalTicks - 1 : totalTicks;
 
-  return skippedTicks;
+  return skippedTicks < 0 ? 0 : skippedTicks;
 }
 
 function runOneTimeEventIfScheduled(state, oneTimeEventIndex) {
