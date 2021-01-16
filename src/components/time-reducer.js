@@ -135,17 +135,18 @@ export function getExtraTicks({currentTime, previousTime, tickInterval}) {
 }
 export function getTicksNeededToRecalibrate({
   currentTime,
-  previousTime,
+
   tickInterval,
   startTime,
-  expectedMillisecondsPassed,
+  expectedTimePassed,
 }) {
   if (tickInterval === 0) {
     throw Error("tick interval must be greater than 0");
   }
   const realTimePassed = currentTime - startTime;
-  const x = realTimePassed - expectedMillisecondsPassed;
+  const x = realTimePassed - expectedTimePassed;
   const totalTicks = Math.floor(x / tickInterval);
+
   const currentTickCount = 1;
   const extraTicksNeeded = totalTicks - currentTickCount;
 
