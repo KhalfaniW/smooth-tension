@@ -347,6 +347,8 @@ function createState() {
       intervalMilliseconds:
         gameState.defaultIncrementInterval / gameState.speedMultiplier,
       runEvent: (gameState) => {
+        console.log("real time", gameState.timeSinceEpochMS);
+        console.log("simulated time", gameState.millisecondsPassed);
         if (gameState.isFocusModeEnabled && gameState.isVisible) {
           return reduceGameState(gameState, {
             type: "SET_VARIABLE",
