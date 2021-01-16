@@ -40,9 +40,9 @@ export function timeReducer(state, action) {
 
         return newState;
       case "HANDLE_TIME_TICK":
-        newState = produce(state, (draftState) => {
-          draftState.millisecondsPassed += draftState.millisecondsPerTick;
-        });
+        // newState = produce(state, (draftState) => {
+        //   draftState.millisecondsPassed += draftState.millisecondsPerTick;
+        // });
 
         for (var i = 0; i < draftState.intervalEvents.length; i++) {
           newState = runIntervalEventIfScheduled(newState, i);
