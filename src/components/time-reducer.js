@@ -1,9 +1,15 @@
 import produce from "immer";
+import {times} from "lodash";
+
 export function timeReducer(state, action) {
   return produce(state, (draftState) => {
+    let newState;
     switch (action.type) {
+      //setInterval ticks may be skipped; simulate them if missed
+      case "HANDLE_UNRELIABLE_TIME_TICK":
+        return state;
       case "HANDLE_TIME_TICK":
-        let newState = produce(state, (draftState) => {
+        newState = produce(state, (draftState) => {
           draftState.millisecondsPassed += draftState.millisecondsPerTick;
         });
 
@@ -15,6 +21,32 @@ export function timeReducer(state, action) {
           newState = runOneTimeEventIfScheduled(newState, i);
         }
         return newState;
+      case "HANDLE_SKIPPED_TICKS":
+        //run skpped ticks but not final/current
+        const skippedTicks = getSkippedTicks({
+          currentTime: action.timeSinceEpochMS,
+          previousTime: draftState.timeSinceEpochMS,
+          interval: draftState.millisecondsPassed,
+        });
+
+        newState = produce(state, (draftState) => {
+          draftState.timeSinceEpochMS = action.timeSinceEpochMS;
+        });
+
+        times(skippedTicks, () => {
+          newState = timeReducer(newState, {type: "HANDLE_TIME_TICK"});
+        });
+
+        for (var i = 0; i < draftState.intervalEvents.length; i++) {
+          //immer drafts needs to be copied becuase they cannot be reassigned
+          newState = runIntervalEventIfScheduled(newState, i);
+        }
+
+        for (i = 0; i < draftState.oneTimeEvents.length; i++) {
+          newState = runOneTimeEventIfScheduled(newState, i);
+        }
+        return newState;
+
       case "SET_EVENT_INTERVAL":
         const index = draftState.intervalEvents.reduce(
           (indexAcc, event, index) => {
@@ -43,6 +75,8 @@ export function createTimerState() {
     millisecondsPerTick: 50,
     oneTimeEvents: [],
     intervalEvents: [],
+    timeSinceEpochMS: 0,
+    previousTimeSinceEpochMS: 0,
   };
 }
 export function getPendingEvents(state) {
@@ -53,6 +87,13 @@ export function getPendingEvents(state) {
 export function getIsEventPending({state, id}) {
   return getPendingEvents(state).some((event) => event.id === id);
 }
+export function getSkippedTicks({currentTime, previousTime, interval}) {
+  const skippedTime = currentTime - previousTime;
+  const shouldTickNow = skippedTime % interval === 0;
+  const skippedTicks = Math.floor(skippedTime / interval);
+  return skippedTicks;
+}
+
 function runOneTimeEventIfScheduled(state, oneTimeEventIndex) {
   return produce(state, (draftState) => {
     const oneTimeEvent = state.oneTimeEvents[oneTimeEventIndex];
