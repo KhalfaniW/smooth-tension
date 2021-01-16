@@ -25,10 +25,16 @@ export function timeReducer(state, action) {
             timeSinceEpochMS: action.timeSinceEpochMS,
           });
         }
-        newState = timeReducer(newState, {
-          type: "HANDLE_TIME_TICK",
-          timeSinceEpochMS: action.timeSinceEpochMS,
-        });
+
+        if (
+          action.timeSinceEpochMS - state.timeSinceEpochMS >=
+          state.millisecondsPerTick
+        ) {
+          newState = timeReducer(newState, {
+            type: "HANDLE_TIME_TICK",
+            timeSinceEpochMS: action.timeSinceEpochMS,
+          });
+        }
 
         return newState;
       case "HANDLE_TIME_TICK":
