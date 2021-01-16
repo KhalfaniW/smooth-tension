@@ -58,8 +58,13 @@ export function timeReducer(state, action) {
         newState = produce(state, (draftState) => {
           draftState.timeSinceEpochMS = action.timeSinceEpochMS;
         });
-
-        const realTimePassed = action.timeSinceEpochMS - state.startTime;
+        getExtraTicks({
+          currentTime: action.timeSinceEpochMS,
+          tickInterval,
+          startTime,
+          expectedTimePassed,
+        });
+        const realTimePassed = -state.startTime;
         const incorrectTimeDifference =
           realTimePassed - state.millisecondsPassed;
         const y =
@@ -130,16 +135,17 @@ export function getSkippedTicks({currentTime, previousTime, tickInterval}) {
   return skippedTicks < 0 ? 0 : skippedTicks;
 }
 
-export function getExtraTicks({currentTime, previousTime, tickInterval}) {
+export function getExtraTicks({realTime, timerState}) {
   const ticksNeeded = getTicksNeededToRecalibrate({
-    currentTime,
-    previousTime,
-    tickInterval,
+    realTime: realTime,
+    tickInterval: timerState.millisecondsPerTick,
+    startTime: timerState.startTime,
+    expectedTimePassed: timerState.timePassed,
   });
   return Math.max(ticksNeeded, 0);
 }
 function getTicksNeededToRecalibrate({
-  currentTime,
+  realTime,
   tickInterval,
   startTime,
   expectedTimePassed,
@@ -147,7 +153,7 @@ function getTicksNeededToRecalibrate({
   if (tickInterval === 0) {
     throw Error("tick interval must be greater than 0");
   }
-  const realTimePassed = currentTime - startTime;
+  const realTimePassed = realTime - startTime;
   const incorrectTimeDifference = realTimePassed - expectedTimePassed;
   const totalTicksNeeded = Math.floor(incorrectTimeDifference / tickInterval);
 
