@@ -45,11 +45,9 @@ export function timeReducer(state, action) {
         newState = produce(state, (draftState) => {
           draftState.timeSinceEpochMS = action.timeSinceEpochMS;
         });
-        console.log(skippedTicks);
-        return state;
 
         for (i = 0; i < skippedTicks; i++) {
-          // newState = timeReducer(newState, {type: "HANDLE_TIME_TICK"});
+          newState = timeReducer(newState, {type: "HANDLE_TIME_TICK"});
         }
         return newState;
 
