@@ -3,6 +3,7 @@ import {times} from "lodash";
 
 export function timeReducer(state, action) {
   //immer drafts must be copied because they cannot be reassigned
+  debugger;
   return produce(state, (draftState) => {
     let newState = produce(state, (draftState) => {
       return draftState;
