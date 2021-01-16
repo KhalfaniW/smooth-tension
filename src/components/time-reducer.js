@@ -98,6 +98,7 @@ export function createTimerState() {
     oneTimeEvents: [],
     intervalEvents: [],
     timeSinceEpochMS: 0,
+    startTime: 0,
     previousTimeSinceEpochMS: 0,
   };
 }
