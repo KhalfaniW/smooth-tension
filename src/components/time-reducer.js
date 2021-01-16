@@ -23,7 +23,7 @@ export function timeReducer(state, action) {
         //     timeSinceEpochMS: action.timeSinceEpochMS,
         //   });
         // }
-        times(5, () => {
+        times(skippedTicks1, () => {
           newState = timeReducer(newState, {type: "HANDLE_TIME_TICK"});
         });
 
