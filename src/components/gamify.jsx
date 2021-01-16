@@ -2,6 +2,8 @@ import {Checkbox, FormControlLabel, TextField} from "@material-ui/core";
 import React, {useState, useEffect} from "react";
 import produce from "immer";
 import styled from "styled-components";
+import PageVisibility from "react-page-visibility";
+import {usePageVisibility} from "react-page-visibility";
 
 import {createGameState, reduceGameState} from "./game-reducer";
 import {
@@ -20,7 +22,11 @@ export function Game({state = createState(), seed = Date.now()}) {
   }
   const setupTimeEffect = () => {
     const timer = setInterval(() => {
-      dispatch({type: "HANDLE_TIME_TICK"});
+      dispatch({
+        type: "HANDLE_UNRELIABLE_TIME_TICK",
+        timeSinceEpochMS: 5,
+      }),
+        dispatch({type: "HANDLE_TIME_TICK"});
     }, gameState.millisecondsPerTick);
     return () => {
       clearInterval(timer);
@@ -33,21 +39,19 @@ export function Game({state = createState(), seed = Date.now()}) {
   return (
     <GameWrapper
       onMouseEnter={() => {
-        dispatch({
-          type: "SET_VARIABLE",
-          property: "isVisible",
-          value: true,
-        });
+        dispatch(unpauseGame());
       }}
       onMouseLeave={() => {
-        dispatch({
-          type: "SET_VARIABLE",
-          property: "isVisible",
-          value: false,
-        });
+        dispatch(pauseGame());
       }}
     >
       Keep Mouse in this area
+      <PageVisibility
+        onChange={(isVisible) => {
+          const pauseOrUnpauseGame = isVisible ? unpauseGame() : pauseGame();
+          dispatch(pauseOrUnpauseGame);
+        }}
+      ></PageVisibility>
       <button
         onClick={() => {
           dispatch({
@@ -179,8 +183,6 @@ export function UserOneTimeActions({onComplete, actionList}) {
   function handleCheckboxSelect(event) {
     const item = event.target.name;
     const hasItemNotBeenCompleted = isCompletedDictionary[item] === false;
-    console.log(isCompletedDictionary);
-    console.log(actionList);
 
     if (event.target.checked && hasItemNotBeenCompleted) {
       onComplete(item);
@@ -316,10 +318,12 @@ function spendAPoint({gameState, dispatch}) {
     type: "UPDATE_SEED",
   });
 
-  const rewardAddition =
-    getRandomIntInclusive({min: 1, max: 100, seed: gameState.seed}) < 20
-      ? 1
-      : 0;
+  const shouldGiveRandomReward = getShouldGiveRandomReward({
+    probabilityDecimal: 0.6,
+    seed: gameState.randomSeed,
+  });
+
+  const rewardAddition = shouldGiveRandomReward ? 1 : 0;
   dispatch(setRewardAction(gameState.totalReward + rewardAddition));
 }
 function doNothing(gameState) {
@@ -363,13 +367,10 @@ function createState() {
             value: true,
           });
 
-          const randomNumberBetween1and100 = getRandomIntInclusive({
-            min: 1,
-            max: 100,
+          const shouldGiveRandomReward = getShouldGiveRandomReward({
+            probabilityDecimal: 0.6,
             seed: gameState.randomSeed,
           });
-
-          const shouldGiveRandomReward = randomNumberBetween1and100 > 50;
           if (shouldGiveRandomReward) {
             newState = reduceGameState(
               newState,
@@ -397,5 +398,30 @@ function setUserPointsAction(amount) {
     type: "SET_VARIABLE",
     property: "userActionPoints",
     value: amount,
+  };
+}
+
+function getShouldGiveRandomReward({probabilityDecimal, seed}) {
+  const max = 1000;
+  const minimumAcceptable = probabilityDecimal * max;
+  const randomNumberBetween1and100 = getRandomIntInclusive({
+    min: 1,
+    max: max,
+    seed: seed,
+  });
+  return randomNumberBetween1and100 < minimumAcceptable;
+}
+function pauseGame() {
+  return {
+    type: "SET_VARIABLE",
+    property: "isVisible",
+    value: false,
+  };
+}
+function unpauseGame() {
+  return {
+    type: "SET_VARIABLE",
+    property: "isVisible",
+    value: true,
   };
 }
