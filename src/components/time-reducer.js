@@ -136,7 +136,7 @@ export function getSkippedTicks({currentTime, previousTime, tickInterval}) {
 }
 
 export function getExtraTicks({realTime, timerState}) {
-  const ticksNeeded = getTicksNeededToRecalibrate({
+  const ticksNeeded = getTicksNeededToFixTimePassed({
     realTime: realTime,
     tickInterval: timerState.millisecondsPerTick,
     startTime: timerState.startTime,
@@ -144,7 +144,7 @@ export function getExtraTicks({realTime, timerState}) {
   });
   return Math.max(ticksNeeded, 0);
 }
-function getTicksNeededToRecalibrate({
+function getTicksNeededToFixTimePassed({
   realTime,
   tickInterval,
   startTime,
