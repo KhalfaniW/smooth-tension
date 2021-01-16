@@ -39,8 +39,6 @@ export function timeReducer(state, action) {
         newState = produce(state, (draftState) => {
           draftState.millisecondsPassed += draftState.millisecondsPerTick;
         });
-        console.log("mspassed", newState.millisecondsPassed);
-        console.log("t", action.timeSinceEpochMS);
 
         for (var i = 0; i < draftState.intervalEvents.length; i++) {
           newState = runIntervalEventIfScheduled(newState, i);
