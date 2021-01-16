@@ -94,6 +94,9 @@ export function getIsEventPending({state, id}) {
   return getPendingEvents(state).some((event) => event.id === id);
 }
 export function getSkippedTicks({currentTime, previousTime, interval}) {
+  if (interval === 0) {
+    throw Error("Interval Must Be > 0");
+  }
   const skippedTime = currentTime - previousTime;
   const shouldTickNow = skippedTime % interval === 0;
 
