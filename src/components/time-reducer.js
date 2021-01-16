@@ -18,7 +18,7 @@ export function timeReducer(state, action) {
     switch (action.type) {
       case "HANDLE_UNRELIABLE_TIME_TICK":
         //setInterval ticks may be skipped some times
-
+        return newState;
         if (skippedTicks1) {
           newState = timeReducer(newState, {
             type: "HANDLE_SKIPPED_TICKS",
