@@ -33,7 +33,9 @@ export function timeReducer(state, action) {
         newState = produce(state, (draftState) => {
           draftState.timeSinceEpochMS = action.timeSinceEpochMS;
         });
-
+        for (i = 0; i < skippedTicks; i++) {
+          newState = runOneTimeEventIfScheduled(newState, i);
+        }
         times(skippedTicks, () => {
           newState = timeReducer(newState, {type: "HANDLE_TIME_TICK"});
         });
