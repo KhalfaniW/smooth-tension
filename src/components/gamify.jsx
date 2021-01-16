@@ -18,7 +18,7 @@ export function Game({state = createState(), seed = Date.now()}) {
   const [gameState, setState] = useState({
     ...state,
     seed: seed,
-    millisecondsPerTick: 5000,
+    millisecondsPerTick: 500,
   });
 
   function dispatch(event) {
@@ -26,10 +26,10 @@ export function Game({state = createState(), seed = Date.now()}) {
   }
   const setupTimeEffect = () => {
     const timer = setInterval(() => {
-      dispatch({
-        type: "HANDLE_UNRELIABLE_TIME_TICK",
-        timeSinceEpochMS: Date.now(),
-      });
+      // dispatch({
+      //   type: "HANDLE_UNRELIABLE_TIME_TICK",
+      //   timeSinceEpochMS: Date.now(),
+      // });
     }, gameState.millisecondsPerTick);
 
     return () => {
@@ -62,6 +62,11 @@ export function Game({state = createState(), seed = Date.now()}) {
             type: "SET_VARIABLE",
             property: "isFocusModeEnabled",
             value: true,
+          });
+
+          dispatch({
+            type: "HANDLE_UNRELIABLE_TIME_TICK",
+            timeSinceEpochMS: Date.now(),
           });
         }}
       >
