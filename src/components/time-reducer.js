@@ -66,14 +66,11 @@ export function timeReducer(state, action) {
         const realTimePassed = action.timeSinceEpochMS - state.startTime;
         const x = realTimePassed - state.millisecondsPassed;
         const y = x > 0 ? Math.floor(x / state.millisecondsPerTick) : 0;
-        console.log(
-          "original diff",
-          realTimePassed - newState.millisecondsPassed,
-        );
+
         for (i = 0; i < y; i++) {
           newState = timeReducer(newState, {type: "HANDLE_TIME_TICK"});
         }
-        console.log("diff", realTimePassed - newState.millisecondsPassed);
+
         return newState;
 
       case "SET_EVENT_INTERVAL":
