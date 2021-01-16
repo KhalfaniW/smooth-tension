@@ -58,7 +58,7 @@ export function timeReducer(state, action) {
         newState = produce(state, (draftState) => {
           draftState.timeSinceEpochMS = action.timeSinceEpochMS;
         });
-        getExtraTicks({
+        const extraTicksNeeded = getExtraTicksNeeded({
           realTime: action.timeSinceEpochMS,
           timerState: state,
         });
@@ -70,8 +70,8 @@ export function timeReducer(state, action) {
             ? Math.floor(incorrectTimeDifference / state.millisecondsPerTick) -
               1
             : 0;
-        console.log({skippedTicks1, y});
-        for (i = 0; i < y; i++) {
+
+        for (i = 0; i < extraTicksNeeded; i++) {
           newState = timeReducer(newState, {type: "HANDLE_TIME_TICK"});
         }
 
@@ -133,7 +133,7 @@ export function getSkippedTicks({currentTime, previousTime, tickInterval}) {
   return skippedTicks < 0 ? 0 : skippedTicks;
 }
 
-export function getExtraTicks({realTime, timerState}) {
+export function getExtraTicksNeeded({realTime, timerState}) {
   const ticksNeeded = getTicksNeededToFixTimePassed({
     realTime: realTime,
     tickInterval: timerState.millisecondsPerTick,
