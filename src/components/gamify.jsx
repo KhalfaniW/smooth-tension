@@ -32,7 +32,7 @@ export function Game({state = createState(), seed = Date.now()}) {
       dispatch({
         type: "HANDLE_TIME_TICK",
       });
-    }, gameState.millisecondsPerTick);
+    }, 500);
     return () => {
       clearInterval(timer);
     };
