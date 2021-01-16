@@ -13,7 +13,7 @@ export function timeReducer(state, action) {
         });
 
         newState = timeReducer(newState, {
-          type: "HANDLE_SKIPPED_TICK",
+          type: "HANDLE_SKIPPED_TICKS",
           timeSinceEpochMS: action.timeSinceEpochMS,
         });
         newState = timeReducer(newState, {
