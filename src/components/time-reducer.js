@@ -12,7 +12,10 @@ export function timeReducer(state, action) {
           return draftState;
         });
 
-        newState = timeReducer(newState, {type: "HANDLE_SKIPPED_TICK"});
+        newState = timeReducer(newState, {
+          type: "HANDLE_SKIPPED_TICK",
+          timeSinceEpochMS: action.timeSinceEpochMS,
+        });
         return state;
       case "HANDLE_TIME_TICK":
         newState = produce(state, (draftState) => {
