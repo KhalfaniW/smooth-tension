@@ -13,7 +13,7 @@ import {
 } from "./time-reducer";
 import {getRandomIntInclusive} from "./random-reducer";
 import {settings, resistingSettings} from "./game-settings";
-
+let startTime;
 export function Game({state = createState(), seed = Date.now()}) {
   const [gameState, setState] = useState({
     ...state,
@@ -25,6 +25,7 @@ export function Game({state = createState(), seed = Date.now()}) {
     setState((gameState) => reduceGameState(gameState, event));
   }
   const setupTimeEffect = () => {
+    startTime = Date.now();
     const timer = setInterval(() => {
       dispatch({
         type: "HANDLE_UNRELIABLE_TIME_TICK",
@@ -347,7 +348,7 @@ function createState() {
       intervalMilliseconds:
         gameState.defaultIncrementInterval / gameState.speedMultiplier,
       runEvent: (gameState) => {
-        console.log("real time", Date.now() - gameState.timeSinceEpochMS);
+        console.log("real time", gameState.timeSinceEpochMS - startTime);
         console.log("simulated time", gameState.millisecondsPassed);
         if (gameState.isFocusModeEnabled && gameState.isVisible) {
           return reduceGameState(gameState, {
