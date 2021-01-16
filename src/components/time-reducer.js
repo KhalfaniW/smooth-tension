@@ -16,7 +16,12 @@ export function timeReducer(state, action) {
           type: "HANDLE_SKIPPED_TICK",
           timeSinceEpochMS: action.timeSinceEpochMS,
         });
-        return state;
+        newState = timeReducer(newState, {
+          type: "HANDLE_TIME_TICK",
+          timeSinceEpochMS: action.timeSinceEpochMS,
+        });
+
+        return newState;
       case "HANDLE_TIME_TICK":
         newState = produce(state, (draftState) => {
           draftState.millisecondsPassed += draftState.millisecondsPerTick;
