@@ -26,7 +26,6 @@ export function Game({state = createState(), seed = Date.now()}) {
         type: "HANDLE_UNRELIABLE_TIME_TICK",
         timeSinceEpochMS: 5,
       });
-      dispatch({type: "HANDLE_TIME_TICK"});
     }, gameState.millisecondsPerTick);
     return () => {
       clearInterval(timer);
