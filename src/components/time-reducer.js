@@ -13,12 +13,14 @@ export function timeReducer(state, action) {
       previousTime: draftState.timeSinceEpochMS,
       tickInterval: draftState.millisecondsPerTick,
     });
-    console.log({
-      currentTime: action.timeSinceEpochMS,
-      previousTime: draftState.timeSinceEpochMS,
-      tickInterval: draftState.millisecondsPerTick,
-      s: state.startTime,
-    });
+    if (action.timeSinceEpochMS) {
+      console.log({
+        currentTime: action.timeSinceEpochMS,
+        previousTime: draftState.timeSinceEpochMS,
+        tickInterval: draftState.millisecondsPerTick,
+        s: state.startTime,
+      });
+    }
     switch (action.type) {
       case "HANDLE_UNRELIABLE_TIME_TICK":
         //setInterval ticks may be skipped some times
