@@ -54,11 +54,6 @@ export function timeReducer(state, action) {
         return newState;
       case "HANDLE_SKIPPED_TICKS":
         //run skpped ticks but not final/current
-        const skippedTicks = getSkippedTicks({
-          currentTime: action.timeSinceEpochMS,
-          previousTime: draftState.timeSinceEpochMS,
-          tickInterval: draftState.millisecondsPerTick,
-        });
 
         newState = produce(state, (draftState) => {
           draftState.timeSinceEpochMS = action.timeSinceEpochMS;
@@ -114,6 +109,8 @@ export function getPendingEvents(state) {
 export function getIsEventPending({state, id}) {
   return getPendingEvents(state).some((event) => event.id === id);
 }
+
+//TODO Remove
 export function getSkippedTicks({currentTime, previousTime, tickInterval}) {
   if (tickInterval === 0) {
     throw Error("tick interval must be greater than 0");
@@ -125,6 +122,22 @@ export function getSkippedTicks({currentTime, previousTime, tickInterval}) {
   const skippedTicks = shouldTickNow ? totalTicks - 1 : totalTicks;
 
   return skippedTicks < 0 ? 0 : skippedTicks;
+}
+export function getTicksNeededToRecalibrate({
+  currentTime,
+  previousTime,
+  tickInterval,
+}) {
+  if (tickInterval === 0) {
+    throw Error("tick interval must be greater than 0");
+  }
+  const realTimePassed = currentTime - startTime;
+  const x = realTimePassed - expectedMillisecondsPassed;
+  const totalTicks = Math.floor(x / tickInterval);
+
+  const extraTicksNeeded = Math.floor(x / tickInterval) - 1;
+
+  return extraTicksNeeded;
 }
 
 function runOneTimeEventIfScheduled(state, oneTimeEventIndex) {
