@@ -35,7 +35,6 @@ export function timeReducer(state, action) {
         }
         return newState;
       case "HANDLE_SKIPPED_TICKS":
-        return state;
         //run skpped ticks but not final/current
         const skippedTicks = getSkippedTicks({
           currentTime: action.timeSinceEpochMS,
@@ -47,6 +46,7 @@ export function timeReducer(state, action) {
           draftState.timeSinceEpochMS = action.timeSinceEpochMS;
         });
         console.log(skippedTicks);
+        return state;
 
         for (i = 0; i < skippedTicks; i++) {
           // newState = timeReducer(newState, {type: "HANDLE_TIME_TICK"});
