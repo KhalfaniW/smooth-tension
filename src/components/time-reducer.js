@@ -120,7 +120,7 @@ export function getSkippedTicks({currentTime, previousTime, tickInterval}) {
   const shouldTickNow = skippedTime % tickInterval === 0;
 
   const totalTicks = Math.floor(skippedTime / tickInterval);
-  const skippedTicks = shouldTickNow ? totalTicks - 2 : totalTicks;
+  const skippedTicks = shouldTickNow ? totalTicks - 3 : totalTicks;
 
   return skippedTicks < 0 ? 0 : skippedTicks;
 }
