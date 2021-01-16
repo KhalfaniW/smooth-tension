@@ -133,22 +133,24 @@ export function getExtraTicks({currentTime, previousTime, tickInterval}) {
   });
   return Math.max(ticksNeeded, 0);
 }
-// export function getTicksNeededToRecalibrate({
-//   currentTime,
-//   previousTime,
-//   tickInterval,
-// }) {
-//   if (tickInterval === 0) {
-//     throw Error("tick interval must be greater than 0");
-//   }
-//   const realTimePassed = currentTime - startTime;
-//   const x = realTimePassed - expectedMillisecondsPassed;
-//   const totalTicks = Math.floor(x / tickInterval);
+export function getTicksNeededToRecalibrate({
+  currentTime,
+  previousTime,
+  tickInterval,
+  startTime,
+  expectedMillisecondsPassed,
+}) {
+  if (tickInterval === 0) {
+    throw Error("tick interval must be greater than 0");
+  }
+  const realTimePassed = currentTime - startTime;
+  const x = realTimePassed - expectedMillisecondsPassed;
+  const totalTicks = Math.floor(x / tickInterval);
+  const currentTickCount = 1;
+  const extraTicksNeeded = totalTicks - currentTickCount;
 
-//   const extraTicksNeeded = Math.floor(x / tickInterval) - 1;
-
-//   return extraTicksNeeded;
-// }
+  return extraTicksNeeded;
+}
 
 function runOneTimeEventIfScheduled(state, oneTimeEventIndex) {
   return produce(state, (draftState) => {
