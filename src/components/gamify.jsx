@@ -64,12 +64,6 @@ export function Game({state = createState(), seed = Date.now()}) {
             property: "isFocusModeEnabled",
             value: true,
           });
-          const d = Date.now();
-          console.log(d);
-          dispatch({
-            type: "HANDLE_UNRELIABLE_TIME_TICK",
-            timeSinceEpochMS: d,
-          });
         }}
       >
         Start
