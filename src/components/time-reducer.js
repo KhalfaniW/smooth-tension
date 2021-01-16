@@ -8,13 +8,21 @@ export function timeReducer(state, action) {
     let newState = produce(state, (draftState) => {
       return draftState;
     });
+    const skippedTicks1 = getSkippedTicks({
+      currentTime: action.timeSinceEpochMS,
+      previousTime: draftState.timeSinceEpochMS,
+      tickInterval: draftState.millisecondsPerTick,
+    });
     switch (action.type) {
       case "HANDLE_UNRELIABLE_TIME_TICK":
         //setInterval ticks may be skipped some times
-        newState = timeReducer(newState, {
-          type: "HANDLE_SKIPPED_TICKS",
-          timeSinceEpochMS: action.timeSinceEpochMS,
-        });
+
+        if (skippedTicks1) {
+          newState = timeReducer(newState, {
+            type: "HANDLE_SKIPPED_TICKS",
+            timeSinceEpochMS: action.timeSinceEpochMS,
+          });
+        }
         newState = timeReducer(newState, {
           type: "HANDLE_TIME_TICK",
           timeSinceEpochMS: action.timeSinceEpochMS,
