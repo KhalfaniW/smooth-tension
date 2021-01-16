@@ -17,6 +17,7 @@ export function timeReducer(state, action) {
       currentTime: action.timeSinceEpochMS,
       previousTime: draftState.timeSinceEpochMS,
       tickInterval: draftState.millisecondsPerTick,
+      s: state.startTime,
     });
     switch (action.type) {
       case "HANDLE_UNRELIABLE_TIME_TICK":
