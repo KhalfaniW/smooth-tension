@@ -17,13 +17,16 @@ export function timeReducer(state, action) {
       case "HANDLE_UNRELIABLE_TIME_TICK":
         //setInterval ticks may be skipped some times
 
-        if (skippedTicks1) {
-          newState = timeReducer(newState, {
-            type: "HANDLE_SKIPPED_TICKS",
-            timeSinceEpochMS: action.timeSinceEpochMS,
-          });
-        }
-
+        // if (skippedTicks1) {
+        //   newState = timeReducer(newState, {
+        //     type: "HANDLE_SKIPPED_TICKS",
+        //     timeSinceEpochMS: action.timeSinceEpochMS,
+        //   });
+        // }
+        times(5,
+            ()=>{    newState = timeReducer(newState, {type: "HANDLE_TIME_TICK"});}
+        
+        
         if (
           action.timeSinceEpochMS - state.timeSinceEpochMS >=
           state.millisecondsPerTick
