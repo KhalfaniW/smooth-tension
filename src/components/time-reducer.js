@@ -56,6 +56,7 @@ export function timeReducer(state, action) {
           realTime: action.timeSinceEpochMS,
           timerState: state,
         });
+        console.log({extraTicksNeeded, state});
         const realTimePassed = -state.startTime;
         const incorrectTimeDifference =
           realTimePassed - state.millisecondsPassed;
