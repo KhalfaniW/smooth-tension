@@ -16,7 +16,10 @@ export function timeReducer(state, action) {
     switch (action.type) {
       case "HANDLE_UNRELIABLE_TIME_TICK":
         //setInterval ticks may be skipped some times
-
+        newState = produce(state, (draftState) => {
+          draftState.millisecondsPassed +=
+            action.timeSinceEpochMS - state.timeSinceEpochMS;
+        });
         if (skippedTicks1) {
           newState = timeReducer(newState, {
             type: "HANDLE_SKIPPED_TICKS",
@@ -36,10 +39,6 @@ export function timeReducer(state, action) {
 
         return newState;
       case "HANDLE_TIME_TICK":
-        newState = produce(state, (draftState) => {
-          draftState.millisecondsPassed += draftState.millisecondsPerTick;
-        });
-
         for (var i = 0; i < draftState.intervalEvents.length; i++) {
           newState = runIntervalEventIfScheduled(newState, i);
         }
