@@ -22,6 +22,7 @@ export function timeReducer(state, action) {
 
         return newState;
       case "HANDLE_TIME_TICK":
+        console.log("tick", Date.now());
         newState = produce(state, (draftState) => {
           draftState.millisecondsPassed += draftState.millisecondsPerTick;
         });
