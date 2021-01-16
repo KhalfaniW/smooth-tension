@@ -33,10 +33,10 @@ export function timeReducer(state, action) {
             timeSinceEpochMS: action.timeSinceEpochMS,
           });
         }
-        newState = produce(state, (draftState) => {
-          draftState.millisecondsPassed =
-            action.timeSinceEpochMS - state.startTime;
-        });
+        // newState = produce(state, (draftState) => {
+        //   draftState.millisecondsPassed =
+        //     action.timeSinceEpochMS - state.startTime;
+        // });
 
         return newState;
       case "HANDLE_TIME_TICK":
