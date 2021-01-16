@@ -119,7 +119,7 @@ export function getExtraTicksNeeded({realTime, timerState}) {
     realTime: realTime,
     tickInterval: timerState.millisecondsPerTick,
     startTime: timerState.startTime,
-    expectedTimePassed: timerState.timePassed,
+    expectedTimePassed: timerState.millisecondsPassed,
   });
   return Math.max(ticksNeeded, 0);
 }
