@@ -8,21 +8,15 @@ export function timeReducer(state, action) {
     let newState = produce(state, (draftState) => {
       return draftState;
     });
-    const skippedTicks1 = getSkippedTicks({
-      currentTime: action.timeSinceEpochMS,
-      previousTime: draftState.timeSinceEpochMS,
-      tickInterval: draftState.millisecondsPerTick,
-    });
+
     switch (action.type) {
       case "HANDLE_UNRELIABLE_TIME_TICK":
         //setInterval ticks may be skipped some times
 
-        if (skippedTicks1) {
-          newState = timeReducer(newState, {
-            type: "HANDLE_SKIPPED_TICKS",
-            timeSinceEpochMS: action.timeSinceEpochMS,
-          });
-        }
+        newState = timeReducer(newState, {
+          type: "HANDLE_SKIPPED_TICKS",
+          timeSinceEpochMS: action.timeSinceEpochMS,
+        });
 
         if (
           action.timeSinceEpochMS - state.timeSinceEpochMS >=
@@ -117,20 +111,6 @@ export function getPendingEvents(state) {
 }
 export function getIsEventPending({state, id}) {
   return getPendingEvents(state).some((event) => event.id === id);
-}
-
-//TODO Remove
-export function getSkippedTicks({currentTime, previousTime, tickInterval}) {
-  if (tickInterval === 0) {
-    throw Error("tick interval must be greater than 0");
-  }
-  const skippedTime = currentTime - previousTime;
-  const shouldTickNow = skippedTime % tickInterval === 0;
-
-  const totalTicks = Math.floor(skippedTime / tickInterval);
-  const skippedTicks = shouldTickNow ? totalTicks - 2 : totalTicks;
-
-  return skippedTicks < 0 ? 0 : skippedTicks;
 }
 
 export function getExtraTicksNeeded({realTime, timerState}) {
