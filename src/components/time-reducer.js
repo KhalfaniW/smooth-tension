@@ -90,7 +90,10 @@ export function getIsEventPending({state, id}) {
 export function getSkippedTicks({currentTime, previousTime, interval}) {
   const skippedTime = currentTime - previousTime;
   const shouldTickNow = skippedTime % interval === 0;
-  const skippedTicks = Math.floor(skippedTime / interval);
+
+  const totalTicks = Math.floor(skippedTime / interval);
+  const skippedTicks = shouldTickNow ? totalTicks - 1 : totalTicks;
+
   return skippedTicks;
 }
 
