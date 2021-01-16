@@ -150,10 +150,10 @@ export function getTicksNeededToRecalibrate({
   }
   const realTimePassed = currentTime - startTime;
   const incorrectTimeDifference = realTimePassed - expectedTimePassed;
-  const totalTicks = Math.floor(incorrectTimeDifference / tickInterval);
+  const totalTicksNeeded = Math.floor(incorrectTimeDifference / tickInterval);
 
-  const currentTickCount = 1;
-  const extraTicksNeeded = totalTicks - currentTickCount;
+  const defaultTickCount = 1;
+  const extraTicksNeeded = totalTicksNeeded - defaultTickCount;
 
   return extraTicksNeeded;
 }
