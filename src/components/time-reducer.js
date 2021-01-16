@@ -34,7 +34,7 @@ export function timeReducer(state, action) {
           });
         }
         newState = produce(state, (draftState) => {
-          draftState.millisecondsPassed +=
+          draftState.millisecondsPassed =
             action.timeSinceEpochMS - state.startTime;
         });
 
