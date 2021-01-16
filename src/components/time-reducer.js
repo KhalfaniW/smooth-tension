@@ -10,10 +10,10 @@ export function timeReducer(state, action) {
     switch (action.type) {
       case "HANDLE_UNRELIABLE_TIME_TICK":
         //setInterval ticks may be skipped some times
-        newState = timeReducer(newState, {
-          type: "HANDLE_SKIPPED_TICKS",
-          timeSinceEpochMS: action.timeSinceEpochMS,
-        });
+        // newState = timeReducer(newState, {
+        //   type: "HANDLE_SKIPPED_TICKS",
+        //   timeSinceEpochMS: action.timeSinceEpochMS,
+        // });
         // newState = timeReducer(newState, {
         //   type: "HANDLE_TIME_TICK",
         //   timeSinceEpochMS: action.timeSinceEpochMS,
