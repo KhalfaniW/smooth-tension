@@ -4,14 +4,13 @@ import {times} from "lodash";
 export function timeReducer(state, action) {
   //immer drafts must be copied because they cannot be reassigned
   return produce(state, (draftState) => {
-    let newState;
+    let newState = produce(state, (draftState) => {
+      return draftState;
+    });
     switch (action.type) {
       case "HANDLE_UNRELIABLE_TIME_TICK":
         //setInterval ticks may be skipped some times
-        newState = produce(state, (draftState) => {
-          return;
-        });
-
+        newState;
         newState = timeReducer(newState, {
           type: "HANDLE_SKIPPED_TICKS",
           timeSinceEpochMS: action.timeSinceEpochMS,
