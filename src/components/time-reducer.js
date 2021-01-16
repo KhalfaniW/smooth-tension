@@ -24,11 +24,6 @@ export function timeReducer(state, action) {
           });
         }
 
-        newState = produce(state, (draftState) => {
-          draftState.millisecondsPassed =
-            action.timeSinceEpochMS - state.startTime;
-        });
-
         if (
           action.timeSinceEpochMS - state.timeSinceEpochMS >=
           state.millisecondsPerTick
@@ -38,11 +33,16 @@ export function timeReducer(state, action) {
             timeSinceEpochMS: action.timeSinceEpochMS,
           });
         }
+        newState = produce(state, (draftState) => {
+          draftState.millisecondsPassed =
+            action.timeSinceEpochMS - state.startTime;
+        });
+
         return newState;
       case "HANDLE_TIME_TICK":
-        // newState = produce(state, (draftState) => {
-        //   draftState.millisecondsPassed += draftState.millisecondsPerTick;
-        // });
+        newState = produce(state, (draftState) => {
+          draftState.millisecondsPassed += draftState.millisecondsPerTick;
+        });
 
         for (var i = 0; i < draftState.intervalEvents.length; i++) {
           newState = runIntervalEventIfScheduled(newState, i);
