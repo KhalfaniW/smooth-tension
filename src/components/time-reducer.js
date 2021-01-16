@@ -29,16 +29,14 @@ export function timeReducer(state, action) {
           interval: draftState.millisecondsPassed,
         });
 
-        //immer drafts needs to be copied becuase they cannot be reassigned
+        //immer drafts needs to be copied because they cannot be reassigned
         newState = produce(state, (draftState) => {
           draftState.timeSinceEpochMS = action.timeSinceEpochMS;
         });
         for (i = 0; i < skippedTicks; i++) {
-          newState = runOneTimeEventIfScheduled(newState, i);
-        }
-        times(skippedTicks, () => {
           newState = timeReducer(newState, {type: "HANDLE_TIME_TICK"});
-        });
+        }
+        times(skippedTicks, () => {});
 
         return newState;
 
