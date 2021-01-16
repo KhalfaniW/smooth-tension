@@ -140,7 +140,6 @@ export function getExtraTicks({currentTime, previousTime, tickInterval}) {
 }
 function getTicksNeededToRecalibrate({
   currentTime,
-
   tickInterval,
   startTime,
   expectedTimePassed,
