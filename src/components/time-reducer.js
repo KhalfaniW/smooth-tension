@@ -91,7 +91,7 @@ export function getPendingEvents(state) {
 export function getIsEventPending({state, id}) {
   return getPendingEvents(state).some((event) => event.id === id);
 }
-export function getSkippedTicks({currentTime, previousTime, interval}) {
+export function getSkippedTicks({currentTime, previousTime, tickInterval}) {
   if (interval === 0) {
     throw Error("Interval must be greater than 0");
   }
