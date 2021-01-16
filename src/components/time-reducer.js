@@ -66,7 +66,7 @@ export function timeReducer(state, action) {
         const realTimePassed = action.timeSinceEpochMS - state.startTime;
         const x = realTimePassed - state.millisecondsPassed;
         const y = x > 0 ? Math.floor(x / state.millisecondsPerTick) - 1 : 0;
-        console.log({skippedTicks,y)
+        console.log({skippedTicks, y});
         for (i = 0; i < y; i++) {
           newState = timeReducer(newState, {type: "HANDLE_TIME_TICK"});
         }
