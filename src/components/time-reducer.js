@@ -123,22 +123,23 @@ export function getSkippedTicks({currentTime, previousTime, tickInterval}) {
 
   return skippedTicks < 0 ? 0 : skippedTicks;
 }
-export function getTicksNeededToRecalibrate({
-  currentTime,
-  previousTime,
-  tickInterval,
-}) {
-  if (tickInterval === 0) {
-    throw Error("tick interval must be greater than 0");
-  }
-  const realTimePassed = currentTime - startTime;
-  const x = realTimePassed - expectedMillisecondsPassed;
-  const totalTicks = Math.floor(x / tickInterval);
 
-  const extraTicksNeeded = Math.floor(x / tickInterval) - 1;
+// export function getTicksNeededToRecalibrate({
+//   currentTime,
+//   previousTime,
+//   tickInterval,
+// }) {
+//   if (tickInterval === 0) {
+//     throw Error("tick interval must be greater than 0");
+//   }
+//   const realTimePassed = currentTime - startTime;
+//   const x = realTimePassed - expectedMillisecondsPassed;
+//   const totalTicks = Math.floor(x / tickInterval);
 
-  return extraTicksNeeded;
-}
+//   const extraTicksNeeded = Math.floor(x / tickInterval) - 1;
+
+//   return extraTicksNeeded;
+// }
 
 function runOneTimeEventIfScheduled(state, oneTimeEventIndex) {
   return produce(state, (draftState) => {
