@@ -27,6 +27,7 @@ export function Game({state = createState(), seed = Date.now()}) {
     //     timeSinceEpochMS: Date.now(),
     //   });
     // }, gameState.millisecondsPerTick);
+    alert(gameState.millisecondsPerTick);
     const timer = setInterval(() => {
       dispatch({
         type: "HANDLE_TIME_TICK",
