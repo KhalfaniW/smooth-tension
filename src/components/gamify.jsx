@@ -27,10 +27,10 @@ export function Game({state = createState(), seed = Date.now()}) {
   }
   const setupTimeEffect = () => {
     const timer = setInterval(() => {
-      // dispatch({
-      //   type: "HANDLE_UNRELIABLE_TIME_TICK",
-      //   timeSinceEpochMS: Date.now(),
-      // });
+      dispatch({
+        type: "HANDLE_UNRELIABLE_TIME_TICK",
+        timeSinceEpochMS: Date.now(),
+      });
     }, gameState.millisecondsPerTick);
 
     return () => {
