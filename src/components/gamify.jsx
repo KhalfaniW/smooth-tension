@@ -19,6 +19,7 @@ export function Game({state = createState(), seed = Date.now()}) {
     ...state,
     seed: seed,
     millisecondsPerTick: 500,
+    timeSinceEpochMS: Date.now(),
   });
 
   function dispatch(event) {
