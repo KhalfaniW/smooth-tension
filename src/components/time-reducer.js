@@ -13,8 +13,7 @@ export function timeReducer(state, action) {
       previousTime: draftState.timeSinceEpochMS,
       tickInterval: draftState.millisecondsPerTick,
     });
-    console.log("st", skippedTicks1);
-    console.log("act", action);
+
     switch (action.type) {
       case "HANDLE_UNRELIABLE_TIME_TICK":
         //setInterval ticks may be skipped some times
