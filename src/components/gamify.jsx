@@ -81,7 +81,13 @@ export function Game({state = createState(), seed = Date.now()}) {
         Tempted
       </button>
       <div>Note how feel</div>
-      <TextField id="outlined-basic" label="Outlined" variant="outlined" />
+      <TextField
+        id="outlined-basic"
+        label="Outlined"
+        variant="outlined"
+        multiline
+        tows={7}
+      />
       <ProgressView progressAmount={gameState.progressAmount} />
       <div>{gameState.isVisible ? "" : "Paused"}</div>
       <div>Speed: {gameState.speedMultiplier}</div>
