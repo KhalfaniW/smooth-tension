@@ -334,7 +334,7 @@ function spendAPoint({gameState, dispatch}) {
   });
 
   const shouldGiveRandomReward = getShouldGiveRandomReward({
-    probabilityDecimal: 0.6,
+    probabilityDecimal: 0.5,
     seed: gameState.randomSeed,
   });
 
