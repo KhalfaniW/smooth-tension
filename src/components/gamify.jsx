@@ -88,6 +88,7 @@ export function Game({state = createState(), seed = Date.now()}) {
         multiline
         tows={7}
       />
+      <MainEditor />
       <ProgressView progressAmount={gameState.progressAmount} />
       <div>{gameState.isVisible ? "" : "Paused"}</div>
       <div>Speed: {gameState.speedMultiplier}</div>
