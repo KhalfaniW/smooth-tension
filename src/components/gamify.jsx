@@ -1,9 +1,10 @@
 import {Checkbox, FormControlLabel, TextField} from "@material-ui/core";
+import PageVisibility from "react-page-visibility";
 import React, {useState, useEffect} from "react";
 import produce from "immer";
 import styled from "styled-components";
-import PageVisibility from "react-page-visibility";
-import {usePageVisibility} from "react-page-visibility";
+
+import MainEditor from "components/main-editor";
 
 import {createGameState, reduceGameState} from "./game-reducer";
 import {
@@ -13,6 +14,7 @@ import {
 } from "./time-reducer";
 import {getRandomIntInclusive} from "./random-reducer";
 import {settings, resistingSettings} from "./game-settings";
+
 let startTime;
 export function Game({state = createState(), seed = Date.now()}) {
   const [gameState, setState] = useState({
@@ -356,9 +358,6 @@ function createState() {
       intervalMilliseconds:
         gameState.defaultIncrementInterval / gameState.speedMultiplier,
       runEvent: (gameState) => {
-        console.log("diff time", Date.now() - gameState.timeSinceEpochMS);
-        console.log("real time", Date.now() - gameState.startTime);
-        console.log("simulated time", gameState.millisecondsPassed);
         if (gameState.isFocusModeEnabled && gameState.isVisible) {
           return reduceGameState(gameState, {
             type: "SET_VARIABLE",
