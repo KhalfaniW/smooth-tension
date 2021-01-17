@@ -193,13 +193,3 @@ describe("Time events ", () => {
     expect(stateThatFiresEvent.oneTimeEvents[0].isCompleted).toBe(true);
   });
 });
-test("get correct skipped time ticks", () => {
-  //the last tick was at previous time
-  //it should give a tick at 10 so it has not skipped the 10th tick
-  expect(
-    getSkippedTicks({currentTime: 10, previousTime: 0, tickInterval: 1}),
-  ).toBe(9);
-  expect(
-    getSkippedTicks({currentTime: 10, previousTime: 0, tickInterval: 3}),
-  ).toBe(3);
-});
