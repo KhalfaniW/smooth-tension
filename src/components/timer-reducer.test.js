@@ -19,7 +19,7 @@ describe("Time events ", () => {
       type: "ADD_INTERVAL_EVENT",
       intervalEvent: createIntervalEvent({
         intervalMilliseconds: 1,
-        runEvent: runEvent,
+        functionName: "runEvent",
       }),
     });
 
@@ -29,7 +29,10 @@ describe("Time events ", () => {
       5,
       () =>
         (newState = produce(newState, (state) =>
-          timeReducer(state, {type: "HANDLE_TIME_TICK"}),
+          timeReducer(state, {
+            type: "HANDLE_TIME_TICK",
+            timeFunctionDictionary: {runEvent},
+          }),
         )),
     );
     expect(runEvent).toHaveBeenCalledTimes(5);
@@ -37,7 +40,7 @@ describe("Time events ", () => {
   test("simulate skipped ticks", () => {
     const runEvent = jest.fn((state) => state);
     let state = {
-      ...createTimerState({intervalMilliseconds: 1, runEvent: () => {}}),
+      ...createTimerState({intervalMilliseconds: 1, functionName: () => {}}),
       timeSinceEpochMS: 0,
       millisecondsPerTick: 1,
     };
@@ -46,7 +49,7 @@ describe("Time events ", () => {
       type: "ADD_INTERVAL_EVENT",
       intervalEvent: createIntervalEvent({
         intervalMilliseconds: 1,
-        runEvent: runEvent,
+        functionName: "runEvent",
       }),
     });
 
@@ -56,6 +59,7 @@ describe("Time events ", () => {
       timeReducer(state, {
         type: "HANDLE_SKIPPED_TICKS",
         timeSinceEpochMS: 5,
+        timeFunctionDictionary: {runEvent},
       }),
     );
     expect(runEvent).toHaveBeenCalledTimes(4);
@@ -64,7 +68,7 @@ describe("Time events ", () => {
   test("run unreliable timer once", () => {
     const runEvent = jest.fn((state) => state);
     let state = {
-      ...createTimerState({intervalMilliseconds: 1, runEvent: () => {}}),
+      ...createTimerState({intervalMilliseconds: 1, functionName: () => {}}),
       timeSinceEpochMS: 0,
       millisecondsPerTick: 5,
     };
@@ -73,7 +77,7 @@ describe("Time events ", () => {
       type: "ADD_INTERVAL_EVENT",
       intervalEvent: createIntervalEvent({
         intervalMilliseconds: 5,
-        runEvent: runEvent,
+        functionName: "runEvent",
       }),
     });
 
@@ -83,6 +87,7 @@ describe("Time events ", () => {
       timeReducer(state, {
         type: "HANDLE_UNRELIABLE_TIME_TICK",
         timeSinceEpochMS: 5,
+        timeFunctionDictionary: {runEvent},
       }),
     );
     expect(runEvent).toHaveBeenCalledTimes(1);
@@ -91,7 +96,7 @@ describe("Time events ", () => {
   test("run timer with simulated skipped ticks", () => {
     const runEvent = jest.fn((state) => state);
     let state = {
-      ...createTimerState({intervalMilliseconds: 1, runEvent: () => {}}),
+      ...createTimerState({intervalMilliseconds: 1, functionName: () => {}}),
       timeSinceEpochMS: 0,
       millisecondsPerTick: 1,
     };
@@ -100,7 +105,7 @@ describe("Time events ", () => {
       type: "ADD_INTERVAL_EVENT",
       intervalEvent: createIntervalEvent({
         intervalMilliseconds: 1,
-        runEvent: runEvent,
+        functionName: "runEvent",
       }),
     });
 
@@ -110,6 +115,7 @@ describe("Time events ", () => {
       timeReducer(state, {
         type: "HANDLE_UNRELIABLE_TIME_TICK",
         timeSinceEpochMS: 5,
+        timeFunctionDictionary: {runEvent},
       }),
     );
     expect(runEvent).toHaveBeenCalledTimes(5);
@@ -135,7 +141,7 @@ describe("Time events ", () => {
       intervalEvent: createIntervalEvent({
         id: id,
         intervalMilliseconds: 100,
-        runEvent: runEvent,
+        functionName: "runEvent",
       }),
     });
 
@@ -152,6 +158,7 @@ describe("Time events ", () => {
       () =>
         (stateThatFiresEvent = timeReducer(stateThatFiresEvent, {
           type: "HANDLE_TIME_TICK",
+          timeFunctionDictionary: {runEvent},
         })),
     );
     expect(runEvent).toHaveBeenCalledTimes(1);
@@ -175,7 +182,7 @@ describe("Time events ", () => {
       oneTimeEvent: createOneTimeEvent({
         id: "test",
         runTime: 1000,
-        runEvent: runEvent,
+        functionName: "runEvent",
       }),
     });
 
@@ -186,6 +193,7 @@ describe("Time events ", () => {
       () =>
         (stateThatFiresEvent = timeReducer(stateThatFiresEvent, {
           type: "HANDLE_TIME_TICK",
+          timeFunctionDictionary: {runEvent},
         })),
     );
 

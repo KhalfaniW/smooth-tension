@@ -5,7 +5,7 @@ import React from "react";
 import {
   CancelableCountdown,
   MeditationTimer,
-  meditationMessageFromTime,
+  getMeditationMessageFromTime,
 } from "./timers";
 
 jest.useFakeTimers();
@@ -20,7 +20,7 @@ describe("timer functions ", () => {
     for (var i = 0; i < 10; i++) {
       const startTime = originalSeconds + i;
       expect(
-        meditationMessageFromTime({
+        getMeditationMessageFromTime({
           seconds: startTime,
           totalSeconds: startTime,
         }),
@@ -32,7 +32,7 @@ describe("timer functions ", () => {
     for (var i = 0; i < 10; i++) {
       const startTime = originalSeconds + i;
       expect(
-        meditationMessageFromTime({
+        getMeditationMessageFromTime({
           seconds: startTime - 1,
           totalSeconds: startTime,
         }),
@@ -41,14 +41,14 @@ describe("timer functions ", () => {
   });
 
   test("create count up message at start", () => {
-    meditationMessageFromTime(298);
+    getMeditationMessageFromTime(298);
     const originalSeconds = 10;
     let secondsElapsed = 0;
     let medtitationTimerBreathInTime = [1, 2, 3, 4];
     secondsElapsed = 0;
     medtitationTimerBreathInTime.forEach((time) => {
       expect(
-        meditationMessageFromTime({
+        getMeditationMessageFromTime({
           seconds: originalSeconds - secondsElapsed,
           totalSeconds: originalSeconds,
         }),
@@ -58,7 +58,7 @@ describe("timer functions ", () => {
   });
 
   test("create count down messages", () => {
-    meditationMessageFromTime(298);
+    getMeditationMessageFromTime(298);
     const originalSeconds = 10;
     let secondsElapsed = 0;
     let medtitationTimerBreathOutTime = [4, 3, 2, 1];
@@ -66,7 +66,7 @@ describe("timer functions ", () => {
     secondsElapsed = 4;
     medtitationTimerBreathOutTime.forEach((time) => {
       expect(
-        meditationMessageFromTime({
+        getMeditationMessageFromTime({
           seconds: originalSeconds - secondsElapsed,
           totalSeconds: originalSeconds,
         }),

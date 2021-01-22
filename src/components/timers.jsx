@@ -6,7 +6,7 @@ export function MeditationTimer({
   seconds = 300,
   autoStart = false,
   isColored = false,
-
+  meditationTimeSettings = defaultMeditationTimeSettings,
   onComplete = () => {},
 }) {
   const autoRedirectCountDownRef = useRef(null);
@@ -30,11 +30,20 @@ export function MeditationTimer({
         autoStart={autoStart}
         renderView={({hours, minutes, seconds, start, pause, isRunning}) => {
           let totalRemainingSeconds = seconds + 60 * minutes + 360 * hours;
-          const meditationMessage = meditationMessageFromTime({
+          const mediationTimeState = {
             seconds: totalRemainingSeconds,
             totalSeconds: totalSeconds,
-          });
-          const isBreathingout = meditationMessage.includes("Out");
+            settings: {
+              countUpStart: 1,
+              countUpEnd: 5,
+              countDownStart: 5,
+              countDownEnd: 1,
+            },
+          };
+          const meditationMessage = getMeditationMessageFromTime(
+            mediationTimeState,
+          );
+          const isBreathingout = getIsBreathOutTime(mediationTimeState);
 
           let meditationIndicator;
           let meditationIndicatorStyle = {};
@@ -153,25 +162,31 @@ export function ProdcutivityTimer({seconds, onComplete = () => {}}) {
     </>
   );
 }
+const defaultMeditationTimeSettings = {
+  countUpStart: 1,
+  countUpEnd: 4,
+  countDownStart: 4,
+  countDownEnd: 1,
+};
 
-export function meditationMessageFromTime({seconds, totalSeconds}) {
-  const totalSecondsForCycle = 8;
+export function getMeditationMessageFromTime({
+  seconds,
+  totalSeconds,
+  settings = defaultMeditationTimeSettings,
+}) {
+  const totalSecondsForCycle =
+    Math.abs(settings.countUpEnd - settings.countUpStart) +
+    1 +
+    Math.abs(settings.countDownEnd - settings.countDownStart) +
+    1;
+
   let elapsedTime = totalSeconds - seconds;
   const index = elapsedTime % totalSecondsForCycle;
 
-  return getMeditationMessages({
-    countUpStart: 1,
-    countUpEnd: 4,
-    countDownStart: 4,
-    countDownEnd: 1,
-  })[index];
+  return getMeditationMessages(settings)[index];
 }
-function getMeditationMessages({
-  countUpStart = 1,
-  countUpEnd = 4,
-  countDownStart = 4,
-  countDownEnd = 1,
-}) {
+function getMeditationMessages(settings) {
+  const {countUpStart, countUpEnd, countDownStart, countDownEnd} = settings;
   const breathInTimes = range(countUpStart, countUpEnd + 1).map((index) => {
     return `${index} Breath In`;
   });
@@ -182,6 +197,18 @@ function getMeditationMessages({
   );
 
   return breathInTimes.concat(breathOutTimes);
+}
+function getIsBreathOutTime({
+  seconds: totalRemainingSeconds,
+  totalSeconds: totalSeconds,
+  settings = defaultMeditationTimeSettings,
+}) {
+  const meditationMessage = getMeditationMessageFromTime({
+    seconds: totalRemainingSeconds,
+    totalSeconds: totalSeconds,
+    settings: settings,
+  });
+  return meditationMessage.includes("Out");
 }
 //TODO COMBINE PAUSABLE WITH CONTROLLED
 export function ControlledCountdown({

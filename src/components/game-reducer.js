@@ -22,7 +22,31 @@ export function reduceGameState(state, action) {
           eventId: "UPDATE_PROGRESS_ID",
           newInterval: newInterval,
         });
+      case "INCREASE_PROGRESS_INCREMENT_SPEED":
+        return reduceGameState(state, {
+          type: "SET_PROGRESS_INCREMENT_SPEED",
+          speedMultiplier: state.speedMultiplier + action.amount,
+        });
 
+      case "DECREASE_PROGRESS_INCREMENT_SPEED":
+        return reduceGameState(state, {
+          type: "SET_PROGRESS_INCREMENT_SPEED",
+          speedMultiplier: state.speedMultiplier - action.amount,
+        });
+
+      case "USE_A_POINT":
+        return reduceGameState(state, {
+          type: "SET_VARIABLE",
+          property: "pointsUsed",
+          value: state.pointsUsed + 1,
+        });
+
+      case "USE_POINTS":
+        return reduceGameState(state, {
+          type: "SET_VARIABLE",
+          property: "pointsUsed",
+          value: state.pointsUsed + action.amount,
+        });
       case "SET_CURRENT_AND_PREVIOUS_VARIABLE":
         draftState["previous_" + action.property] = draftState[action.property];
         draftState[action.property] = action.value;

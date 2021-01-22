@@ -38,11 +38,16 @@ export default function MainEditor({}) {
         onChange={setValue}
       />
       {/* <p style={{"white-space": "pre"}}>*/}
-      <p>
+      <pre
+        style={{
+          textAlign: "left",
+          whiteSpace: "pre-line",
+        }}
+      >
         <br /> <br />
         {markdownText}
         <br /> <br />
-      </p>
+      </pre>
 
       <button
         onClick={() => {

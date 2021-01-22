@@ -33,6 +33,7 @@ export function Game({state = createState(), seed = Date.now()}) {
       dispatch({
         type: "HANDLE_UNRELIABLE_TIME_TICK",
         timeSinceEpochMS: Date.now(),
+        timeFunctionDictionary: {incrementProgress, setRandomReward, doNothing},
       });
     }, gameState.millisecondsPerTick);
 
@@ -41,6 +42,14 @@ export function Game({state = createState(), seed = Date.now()}) {
     };
   };
   useEffect(setupTimeEffect, [gameState.millisecondsPerTick]);
+  useEffect(() => {
+    dispatch({
+      type: "SET_VARIABLE",
+      property: "isFocusModeEnabled",
+      value: true,
+    });
+  }, []);
+
   const allComputedProperties = getComputedProperties(gameState);
   const {totalPoints, pointsRemaining} = allComputedProperties;
 
@@ -95,6 +104,34 @@ export function Game({state = createState(), seed = Date.now()}) {
       <div>{gameState.isVisible ? "" : "Paused"}</div>
       <div>Speed: {gameState.speedMultiplier}</div>
       <div>{gameState.isFocusModeEnabled ? "focused" : null} </div>
+      <button
+        onClick={() => {
+          /* alert(JSON.stringify(getSaveableObjectFromGameState(gameState))); */
+        }}
+      >
+        Increase by .1
+      </button>
+      <button
+        onClick={() => {
+          dispatch({
+            type: "INCREASE_PROGRESS_INCREMENT_SPEED",
+            amount: 0.1,
+          });
+        }}
+      >
+        Increase by .1
+      </button>
+      <button
+        disabled={pointsRemaining < 1}
+        onClick={() => {
+          dispatch({
+            type: "USE_POINTS",
+            amount: 1,
+          });
+        }}
+      >
+        Invest Point
+      </button>
       <div>
         <UserStateActions
           actionList={getUserStateActions(gameState)}
@@ -104,8 +141,8 @@ export function Game({state = createState(), seed = Date.now()}) {
               itemName: itemSelected,
             });
             dispatch({
-              type: "SET_PROGRESS_INCREMENT_SPEED",
-              speedMultiplier: gameState.speedMultiplier + speedChange,
+              type: "INCREASE_PROGRESS_INCREMENT_SPEED",
+              amount: speedChange,
             });
           }}
           onDeselect={(itemSelected) => {
@@ -113,9 +150,10 @@ export function Game({state = createState(), seed = Date.now()}) {
               state: gameState,
               itemName: itemSelected,
             });
+
             dispatch({
-              type: "SET_PROGRESS_INCREMENT_SPEED",
-              speedMultiplier: gameState.speedMultiplier - speedChange,
+              type: "DECREASE_PROGRESS_INCREMENT_SPEED",
+              amount: speedChange,
             });
           }}
         ></UserStateActions>
@@ -243,7 +281,7 @@ function getUserOneTimeActionValue({state, itemName}) {
     itemName
   ];
 }
-
+function getSaveableObjectFromGameState() {}
 export function ProgressView({progressAmount}) {
   return <div>Progress {progressAmount.toFixed(1)}%</div>;
 }
@@ -265,7 +303,7 @@ export function PointsShop({
            Total ${totalReward} `}
       </div>
       <button
-        disabled={pointsRemaining === 0 || isWaitingForReward}
+        disabled={pointsRemaining < 1 || isWaitingForReward}
         onClick={() => {
           onSpendAPoint();
         }}
@@ -318,15 +356,11 @@ function spendAPoint({gameState, dispatch}) {
     oneTimeEvent: createOneTimeEvent({
       id: "WAIT_TO_SHOW_REWARD_ID",
       runTime: gameState.millisecondsPassed + 1000,
-      runEvent: (gameState) => {
-        return produce(gameState, (draftState) => doNothing(gameState));
-      },
+      functionName: "doNothing",
     }),
   });
   dispatch({
-    type: "SET_VARIABLE",
-    property: "pointsUsed",
-    value: gameState.pointsUsed + 1,
+    type: "USE_A_POINT",
   });
 
   dispatch({
@@ -344,6 +378,39 @@ function spendAPoint({gameState, dispatch}) {
 function doNothing(gameState) {
   return gameState;
 }
+function incrementProgress(gameState) {
+  if (gameState.isFocusModeEnabled && gameState.isVisible) {
+    return reduceGameState(gameState, {
+      type: "SET_VARIABLE",
+      property: "progressAmount",
+      value: gameState.progressAmount + gameState.incrementAmount,
+    });
+  }
+  return gameState;
+}
+
+function setRandomReward(gameState) {
+  return produce(gameState, (draftState) => {
+    let newState = reduceGameState(gameState, {
+      type: "SET_VARIABLE",
+      property: "isRandomRewardChecked",
+      value: true,
+    });
+
+    const shouldGiveRandomReward = getShouldGiveRandomReward({
+      probabilityDecimal: 0.6,
+      seed: gameState.randomSeed,
+    });
+    if (shouldGiveRandomReward) {
+      newState = reduceGameState(
+        newState,
+        setUserPointsAction(gameState.userActionPoints + 3),
+      );
+    }
+
+    return newState;
+  });
+}
 function createState() {
   let gameState = {
     ...createGameState(),
@@ -357,16 +424,7 @@ function createState() {
       id: "UPDATE_PROGRESS_ID",
       intervalMilliseconds:
         gameState.defaultIncrementInterval / gameState.speedMultiplier,
-      runEvent: (gameState) => {
-        if (gameState.isFocusModeEnabled && gameState.isVisible) {
-          return reduceGameState(gameState, {
-            type: "SET_VARIABLE",
-            property: "progressAmount",
-            value: gameState.progressAmount + gameState.incrementAmount,
-          });
-        }
-        return gameState;
-      },
+      functionName: "incrementProgress",
     }),
   });
   gameState = reduceGameState(gameState, {
@@ -374,28 +432,7 @@ function createState() {
     oneTimeEvent: createOneTimeEvent({
       id: "SHOW_DELAYED_REWARD_ID",
       runTime: 1000,
-      runEvent: (gameState) => {
-        return produce(gameState, (draftState) => {
-          let newState = reduceGameState(gameState, {
-            type: "SET_VARIABLE",
-            property: "isRandomRewardChecked",
-            value: true,
-          });
-
-          const shouldGiveRandomReward = getShouldGiveRandomReward({
-            probabilityDecimal: 0.6,
-            seed: gameState.randomSeed,
-          });
-          if (shouldGiveRandomReward) {
-            newState = reduceGameState(
-              newState,
-              setUserPointsAction(gameState.userActionPoints + 3),
-            );
-          }
-
-          return newState;
-        });
-      },
+      functionName: "setRandomReward",
     }),
   });
   return gameState;

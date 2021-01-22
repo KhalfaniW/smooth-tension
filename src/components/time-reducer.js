@@ -16,6 +16,7 @@ export function timeReducer(state, action) {
         newState = timeReducer(newState, {
           type: "HANDLE_SKIPPED_TICKS",
           timeSinceEpochMS: action.timeSinceEpochMS,
+          timeFunctionDictionary: action.timeFunctionDictionary,
         });
 
         if (
@@ -25,6 +26,7 @@ export function timeReducer(state, action) {
           newState = timeReducer(newState, {
             type: "HANDLE_TIME_TICK",
             timeSinceEpochMS: action.timeSinceEpochMS,
+            timeFunctionDictionary: action.timeFunctionDictionary,
           });
         }
         // newState = produce(state, (draftState) => {
@@ -37,13 +39,21 @@ export function timeReducer(state, action) {
         newState = produce(state, (draftState) => {
           draftState.millisecondsPassed += draftState.millisecondsPerTick;
         });
-
+        const timeFunctionDictionary = action.timeFunctionDictionary;
         for (var i = 0; i < draftState.intervalEvents.length; i++) {
-          newState = runIntervalEventIfScheduled(newState, i);
+          newState = runIntervalEventIfScheduled(
+            newState,
+            timeFunctionDictionary,
+            i,
+          );
         }
-
+        //TODO Change to object params
         for (i = 0; i < draftState.oneTimeEvents.length; i++) {
-          newState = runOneTimeEventIfScheduled(newState, i);
+          newState = runOneTimeEventIfScheduled(
+            newState,
+            timeFunctionDictionary,
+            i,
+          );
         }
         return newState;
       case "HANDLE_SKIPPED_TICKS":
@@ -58,7 +68,10 @@ export function timeReducer(state, action) {
         });
 
         for (i = 0; i < extraTicksNeeded; i++) {
-          newState = timeReducer(newState, {type: "HANDLE_TIME_TICK"});
+          newState = timeReducer(newState, {
+            type: "HANDLE_TIME_TICK",
+            timeFunctionDictionary: action.timeFunctionDictionary,
+          });
         }
 
         return newState;
@@ -133,7 +146,11 @@ function getTicksNeededToFixTimePassed({
   return extraTicksNeeded;
 }
 
-function runOneTimeEventIfScheduled(state, oneTimeEventIndex) {
+function runOneTimeEventIfScheduled(
+  state,
+  timeFunctionDictionary,
+  oneTimeEventIndex,
+) {
   return produce(state, (draftState) => {
     const oneTimeEvent = state.oneTimeEvents[oneTimeEventIndex];
     if (oneTimeEvent.isCompleted) {
@@ -145,13 +162,18 @@ function runOneTimeEventIfScheduled(state, oneTimeEventIndex) {
       let newState = produce(state, (draftState) => {
         draftState.oneTimeEvents[oneTimeEventIndex].isCompleted = true;
       });
-
-      return oneTimeEvent.runEvent(newState);
+      //TODO Rename runevent :quick:
+      const eventFunction = timeFunctionDictionary[oneTimeEvent.functionName];
+      return eventFunction(newState);
     }
   });
 }
 
-function runIntervalEventIfScheduled(state, timeIntervalEventIndex) {
+function runIntervalEventIfScheduled(
+  state,
+  timeFunctionDictionary,
+  timeIntervalEventIndex,
+) {
   return produce(state, (draftState) => {
     const intervalEvent = state.intervalEvents[timeIntervalEventIndex];
     const nextTimeToIncrement =
@@ -163,29 +185,30 @@ function runIntervalEventIfScheduled(state, timeIntervalEventIndex) {
         draftState.intervalEvents[timeIntervalEventIndex].lastIncrementTime =
           draftState.millisecondsPassed;
       });
-
-      return intervalEvent.runEvent(newState);
+      const eventFunction = timeFunctionDictionary[intervalEvent.functionName];
+      return eventFunction(newState);
     }
   });
 }
-
+//NOTE Function names are stored insteaf of lambdas to allow for persistance
+// functions are sent in a dictionary on time tick
 export function createIntervalEvent({
   intervalMilliseconds,
-  runEvent,
+  functionName,
   id = null,
 }) {
   return {
     id: id,
     lastIncrementTime: 0,
     intervalMilliseconds: intervalMilliseconds,
-    runEvent: runEvent,
+    functionName: functionName,
   };
 }
-export function createOneTimeEvent({runTime, runEvent, id = null}) {
+export function createOneTimeEvent({runTime, functionName, id = null}) {
   return {
     id: id,
     runTime: runTime,
-    runEvent: runEvent,
+    functionName: functionName,
     isCompleted: false,
   };
 }
