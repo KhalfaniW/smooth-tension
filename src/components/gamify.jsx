@@ -1,6 +1,8 @@
-import {Checkbox, FormControlLabel, TextField} from "@material-ui/core";
+import {Checkbox, FormControlLabel} from "@material-ui/core";
 import PageVisibility from "react-page-visibility";
+import ProgressBar from "@bit/react-bootstrap.react-bootstrap.progress-bar";
 import React, {useState, useEffect} from "react";
+import ReactBootstrapStyle from "@bit/react-bootstrap.react-bootstrap.internal.style-links";
 import produce from "immer";
 import styled from "styled-components";
 
@@ -13,11 +15,13 @@ import {
   getIsEventPending,
 } from "./time-reducer";
 import {getRandomIntInclusive} from "./random-reducer";
+
+import {Spring} from "react-spring/renderprops";
+
 import {settings, resistingSettings} from "./game-settings";
 
-let startTime;
 export function Game({state = createState(), seed = Date.now()}) {
-  const [gameState, setState] = useState({
+  const [gameState, setGameState] = useState({
     ...state,
     seed: seed,
     timeSinceEpochMS: Date.now(),
@@ -25,10 +29,9 @@ export function Game({state = createState(), seed = Date.now()}) {
   });
 
   function dispatch(event) {
-    setState((gameState) => reduceGameState(gameState, event));
+    setGameState((gameState) => reduceGameState(gameState, event));
   }
   const setupTimeEffect = () => {
-    startTime = Date.now();
     const timer = setInterval(() => {
       dispatch({
         type: "HANDLE_UNRELIABLE_TIME_TICK",
@@ -41,15 +44,27 @@ export function Game({state = createState(), seed = Date.now()}) {
       clearInterval(timer);
     };
   };
-  useEffect(setupTimeEffect, [gameState.millisecondsPerTick]);
-  useEffect(() => {
+
+  const saveEverySecondEffect = () => {
+    const timer = setInterval(() => {
+      saveState({storageSettings: stateStorageSettings, value: gameState});
+    }, 1000);
+    return () => {
+      clearInterval(timer);
+    };
+  };
+  const startEffect = () => {
     dispatch({
       type: "SET_VARIABLE",
       property: "isFocusModeEnabled",
       value: true,
     });
-  }, []);
+  };
 
+  useEffect(setupTimeEffect, [gameState.millisecondsPerTick]);
+  useEffect(startEffect, []);
+  // useEffect(saveEverySecondEffect, []);
+  // if (isPending) return "Loading...";
   const allComputedProperties = getComputedProperties(gameState);
   const {totalPoints, pointsRemaining} = allComputedProperties;
 
@@ -62,6 +77,26 @@ export function Game({state = createState(), seed = Date.now()}) {
         dispatch(pauseGame());
       }}
     >
+      <button
+        onClick={() => {
+          saveState({storageSettings: stateStorageSettings, value: gameState});
+        }}
+      >
+        Save
+      </button>
+      <br /> <br /> <br />
+      <button
+        onClick={() => {
+          retrieveStoredState({
+            storageSettings: stateStorageSettings,
+            defaultValue: createState(),
+          })
+            .then((retreivedState) => retreivedState)
+            .then((retreivedState) => setGameState(JSON.parse(retreivedState)));
+        }}
+      >
+        Load
+      </button>
       Keep Mouse in this area
       <PageVisibility
         onChange={(isVisible) => {
@@ -92,24 +127,26 @@ export function Game({state = createState(), seed = Date.now()}) {
         Tempted
       </button>
       <div>Note how feel</div>
-      <TextField
-        id="outlined-basic"
-        label="Outlined"
-        variant="outlined"
-        multiline
-        tows={7}
-      />
       <MainEditor />
+      <Spring from={{value: 50}} to={{value: 100}} config={{duration: 5000}}>
+        {(props) => (
+          <div style={{width: "70%"}}>
+            {/* <ReactBootstrapStyle /> */}
+            {/* <ProgressBar now={props.value} /> */}
+            {props.value.toFixed(0)}/100
+          </div>
+        )}
+      </Spring>
       <ProgressView progressAmount={gameState.progressAmount} />
       <div>{gameState.isVisible ? "" : "Paused"}</div>
       <div>Speed: {gameState.speedMultiplier}</div>
       <div>{gameState.isFocusModeEnabled ? "focused" : null} </div>
       <button
         onClick={() => {
-          /* alert(JSON.stringify(getSaveableObjectFromGameState(gameState))); */
+          alert(JSON.stringify(gameState));
         }}
       >
-        Increase by .1
+        show
       </button>
       <button
         onClick={() => {
@@ -281,9 +318,21 @@ function getUserOneTimeActionValue({state, itemName}) {
     itemName
   ];
 }
-function getSaveableObjectFromGameState() {}
+//Start
+const stateStorageSettings = {userId: "DEMO_USER", itemName: "gameState"};
+async function retrieveStoredState({storageSettings, defaultValue}) {
+  await null;
+  const key = storageSettings.userId + storageSettings.name;
+
+  return window.localStorage.getItem(key) || defaultValue;
+}
+function saveState({storageSettings, value}) {
+  const key = storageSettings.userId + storageSettings.name;
+  window.localStorage.setItem(key, JSON.stringify(value));
+}
+//End
 export function ProgressView({progressAmount}) {
-  return <div>Progress {progressAmount.toFixed(1)}%</div>;
+  return <div>Power {progressAmount.toFixed(1)}</div>;
 }
 
 export function PointsShop({
@@ -299,8 +348,8 @@ export function PointsShop({
       <div>
         {isWaitingForReward
           ? `Calculating progress Addendum`
-          : ` last reward ${lastReward}
-           Total ${totalReward} `}
+          : ` Total ${totalReward}/3  
+\n           last reward ${lastReward}`}
       </div>
       <button
         disabled={pointsRemaining < 1 || isWaitingForReward}
