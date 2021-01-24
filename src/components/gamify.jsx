@@ -1,12 +1,10 @@
 import {Checkbox, FormControlLabel} from "@material-ui/core";
-import PageVisibility from "react-page-visibility";
-import ProgressBar from "@bit/react-bootstrap.react-bootstrap.progress-bar";
+import {Spring} from "react-spring/renderprops";
+import {throttle} from "lodash";
+import NumberFormat from "react-number-format";
 import React, {useState, useEffect} from "react";
-import ReactBootstrapStyle from "@bit/react-bootstrap.react-bootstrap.internal.style-links";
 import produce from "immer";
 import styled from "styled-components";
-
-import MainEditor from "components/main-editor";
 
 import {createGameState, reduceGameState} from "./game-reducer";
 import {
@@ -15,19 +13,44 @@ import {
   getIsEventPending,
 } from "./time-reducer";
 import {getRandomIntInclusive} from "./random-reducer";
-
-import {Spring} from "react-spring/renderprops";
-
 import {settings, resistingSettings} from "./game-settings";
+import {useLocalStorage} from "react-use";
 
-export function Game({state = createState(), seed = Date.now()}) {
-  const [gameState, setGameState] = useState({
+export function Game({
+  state = createState(),
+  seed = Date.now(),
+  currentTimeMS = Date.now(),
+  onGameStateUpdate = () => {},
+  //TODO move pause state up
+  isPaused = null,
+  isVisible = true,
+}) {
+  const storageKey = "DEMO_12345";
+  const defaultGameState = {
     ...state,
     seed: seed,
-    timeSinceEpochMS: Date.now(),
-    startTime: Date.now(),
-  });
+    timeSinceEpochMS: currentTimeMS,
+    startTime: currentTimeMS,
+    isVisible: isVisible,
+  };
+  const [savedGameStateString, setsavedGameStateString] = useLocalStorage(
+    storageKey,
+    JSON.stringify(defaultGameState),
+  );
 
+  const [gameState, setGameState] = useState(JSON.parse(savedGameStateString));
+
+  if (gameState.isVisible !== isVisible) {
+    dispatch({
+      type: "SET_VARIABLE",
+      property: "isVisible",
+      value: isVisible,
+    });
+  }
+  const saveStateTimeSafe = throttle(
+    () => setsavedGameStateString(JSON.stringify(gameState)),
+    1000,
+  );
   function dispatch(event) {
     setGameState((gameState) => reduceGameState(gameState, event));
   }
@@ -45,14 +68,6 @@ export function Game({state = createState(), seed = Date.now()}) {
     };
   };
 
-  const saveEverySecondEffect = () => {
-    const timer = setInterval(() => {
-      saveState({storageSettings: stateStorageSettings, value: gameState});
-    }, 1000);
-    return () => {
-      clearInterval(timer);
-    };
-  };
   const startEffect = () => {
     dispatch({
       type: "SET_VARIABLE",
@@ -63,11 +78,9 @@ export function Game({state = createState(), seed = Date.now()}) {
 
   useEffect(setupTimeEffect, [gameState.millisecondsPerTick]);
   useEffect(startEffect, []);
-  // useEffect(saveEverySecondEffect, []);
   // if (isPending) return "Loading...";
   const allComputedProperties = getComputedProperties(gameState);
   const {totalPoints, pointsRemaining} = allComputedProperties;
-
   return (
     <GameWrapper
       onMouseEnter={() => {
@@ -79,31 +92,13 @@ export function Game({state = createState(), seed = Date.now()}) {
     >
       <button
         onClick={() => {
-          saveState({storageSettings: stateStorageSettings, value: gameState});
+          saveStateTimeSafe();
         }}
       >
         Save
       </button>
       <br /> <br /> <br />
-      <button
-        onClick={() => {
-          retrieveStoredState({
-            storageSettings: stateStorageSettings,
-            defaultValue: createState(),
-          })
-            .then((retreivedState) => retreivedState)
-            .then((retreivedState) => setGameState(JSON.parse(retreivedState)));
-        }}
-      >
-        Load
-      </button>
       Keep Mouse in this area
-      <PageVisibility
-        onChange={(isVisible) => {
-          const pauseOrUnpauseGame = isVisible ? unpauseGame() : pauseGame();
-          dispatch(pauseOrUnpauseGame);
-        }}
-      ></PageVisibility>
       <button
         onClick={() => {
           dispatch({
@@ -113,7 +108,7 @@ export function Game({state = createState(), seed = Date.now()}) {
           });
         }}
       >
-        Start
+        I am tempted
       </button>
       <button
         onClick={() => {
@@ -124,30 +119,41 @@ export function Game({state = createState(), seed = Date.now()}) {
           });
         }}
       >
-        Tempted
+        I am just bored
       </button>
-      <div>Note how feel</div>
-      <MainEditor />
-      <Spring from={{value: 50}} to={{value: 100}} config={{duration: 5000}}>
+      <Spring from={{value: 50}} to={{value: 90}} config={{duration: 5000}}>
         {(props) => (
           <div style={{width: "70%"}}>
             {/* <ReactBootstrapStyle /> */}
             {/* <ProgressBar now={props.value} /> */}
-            {props.value.toFixed(0)}/100
+            {"Time Value"}
+            <br />
+            {Math.min(
+              100,
+              props.value + pointsRemaining + gameState.userActionPoints,
+            ).toFixed(0)}
+            /100
+            <br />
+            {"Points on completing 10\n"}
           </div>
         )}
       </Spring>
       <ProgressView progressAmount={gameState.progressAmount} />
       <div>{gameState.isVisible ? "" : "Paused"}</div>
-      <div>Speed: {gameState.speedMultiplier}</div>
+      <div>
+        Speed:{" "}
+        <NumberFormat
+          value={gameState.speedMultiplier}
+          displayType={"text"}
+          thousandSeparator={true}
+          prefix={""}
+        />
+        {/* {getNumberStringOptionalRounding({ */}
+        {/*   number: gameState.speedMultiplier, */}
+        {/*   maxDecimal: 2, */}
+        {/* })} */}
+      </div>
       <div>{gameState.isFocusModeEnabled ? "focused" : null} </div>
-      <button
-        onClick={() => {
-          alert(JSON.stringify(gameState));
-        }}
-      >
-        show
-      </button>
       <button
         onClick={() => {
           dispatch({
@@ -170,31 +176,6 @@ export function Game({state = createState(), seed = Date.now()}) {
         Invest Point
       </button>
       <div>
-        <UserStateActions
-          actionList={getUserStateActions(gameState)}
-          onSelect={(itemSelected) => {
-            const speedChange = getUserStateActionValue({
-              state: gameState,
-              itemName: itemSelected,
-            });
-            dispatch({
-              type: "INCREASE_PROGRESS_INCREMENT_SPEED",
-              amount: speedChange,
-            });
-          }}
-          onDeselect={(itemSelected) => {
-            const speedChange = getUserStateActionValue({
-              state: gameState,
-              itemName: itemSelected,
-            });
-
-            dispatch({
-              type: "DECREASE_PROGRESS_INCREMENT_SPEED",
-              amount: speedChange,
-            });
-          }}
-        ></UserStateActions>
-        Block
         <UserOneTimeActions
           actionList={getUserOneTimeActions(gameState)}
           onComplete={(itemSelected) => {
@@ -210,7 +191,7 @@ export function Game({state = createState(), seed = Date.now()}) {
         />
       </div>
       {gameState.isRandomRewardChecked ? (
-        <div>Reward: {gameState.userActionPoints}</div>
+        <div>Open App Points: {gameState.userActionPoints}</div>
       ) : (
         <>Calculating...</>
       )}
@@ -239,28 +220,7 @@ const GameWrapper = styled.div`
   color: #444;
   border: 1px solid #1890ff;
 `;
-export function UserStateActions({onSelect, onDeselect, actionList}) {
-  function handleCheckboxSelect(event) {
-    if (event.target.checked) {
-      onSelect(event.target.name);
-    } else {
-      onDeselect(event.target.name);
-    }
-  }
-  return (
-    <div>
-      {actionList.map((physicalStateForUserToBeIn) => (
-        <FormControlLabel
-          key={physicalStateForUserToBeIn}
-          value="start"
-          label={physicalStateForUserToBeIn}
-          name={physicalStateForUserToBeIn}
-          control={<Checkbox color="primary" onChange={handleCheckboxSelect} />}
-        />
-      ))}
-    </div>
-  );
-}
+
 export function UserOneTimeActions({onComplete, actionList}) {
   const originalDictionary = actionList.reduce(function(dictionary, item) {
     dictionary[item] = false;
@@ -339,25 +299,40 @@ export function PointsShop({
   onSpendAPoint,
   totalPoints,
   pointsRemaining,
-  lastReward,
-  totalReward,
   isWaitingForReward,
+  totalReward,
 }) {
+  const isAbleToSpendAPoint = pointsRemaining < 1 || isWaitingForReward;
   return (
     <div>
       <div>
         {isWaitingForReward
           ? `Calculating progress Addendum`
-          : ` Total ${totalReward}/3  
-\n           last reward ${lastReward}`}
+          : ` Total Score ${totalReward}/3 goal `}
       </div>
       <button
-        disabled={pointsRemaining < 1 || isWaitingForReward}
+        disabled={isAbleToSpendAPoint}
         onClick={() => {
           onSpendAPoint();
         }}
       >
-        Use Point
+        Try Buy Final Reward
+      </button>
+      <button
+        disabled={isAbleToSpendAPoint}
+        onClick={() => {
+          onSpendAPoint();
+        }}
+      >
+        Buy increase in time incrementer
+      </button>
+      <button
+        disabled={isAbleToSpendAPoint}
+        onClick={() => {
+          onSpendAPoint();
+        }}
+      >
+        Increase probabilty of getting reward
       </button>
     </div>
   );
@@ -396,7 +371,6 @@ function getComputedProperties(gameState) {
     pointsRemaining,
     isWaitingForReward,
     previousTotalReward,
-    lastReward: gameState.totalReward - previousTotalReward,
   };
 }
 function spendAPoint({gameState, dispatch}) {
