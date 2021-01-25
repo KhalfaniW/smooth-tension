@@ -84,3 +84,17 @@ export function createGameState(seed = 5) {
     pointsUsed: 0,
   };
 }
+export function pauseGame() {
+  return {
+    type: "SET_VARIABLE",
+    property: "isVisible",
+    value: false,
+  };
+}
+export function unPauseGame() {
+  return {
+    type: "SET_VARIABLE",
+    property: "isVisible",
+    value: true,
+  };
+}
