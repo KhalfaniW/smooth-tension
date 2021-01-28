@@ -19,8 +19,6 @@ export function createState() {
       functionName: "incrementProgress",
     }),
   });
-  //TODO replace with reducer to create maybe reward
-  gameState = changeRandomReward(gameState);
 
   return gameState;
 }

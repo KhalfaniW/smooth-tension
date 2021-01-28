@@ -1,5 +1,7 @@
 import produce from "immer";
 
+import {changeRandomReward} from "components/game/game-tools";
+
 import {createRandomSeedState, randomReducer} from "./random-reducer";
 import {createTimerState, timeReducer} from "./time-reducer";
 
@@ -55,9 +57,11 @@ export function reduceGameState(state, action) {
       case "SET_VARIABLE":
         draftState[action.property] = action.value;
         break;
-      case "SET_OBJECT": //TODO remov
+      case "SET_OBJECT": //TODO remove
         draftState[action.property] = action.value;
         break;
+      case "GIVE_RANDOM_OPENING_REWARD":
+        return changeRandomReward(draftState);
 
       case "TOGGLE_BOOLEAN":
         draftState[action.property] = !draftState[action.property];
@@ -82,6 +86,7 @@ export function createGameState(seed = 5) {
     speedMultiplier: 1,
     isVisible: true,
     pointsUsed: 0,
+    previousRewardForOpeningTimeSinceEpoch: 0,
   };
 }
 export function pauseGame() {

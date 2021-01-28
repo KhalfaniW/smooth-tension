@@ -1,3 +1,4 @@
+import {useInterval} from "ahooks";
 import PageVisibility from "react-page-visibility";
 import React, {useState, useEffect} from "react";
 import styled from "styled-components";
@@ -14,13 +15,15 @@ import {
   incrementProgress,
   spendAPoint,
 } from "components/game/game-tools";
-
-import RewardForOpening from "components/game/game-reward-for-opening";
-
 import {createState} from "components/game/game-initializer";
 import {pauseGame, reduceGameState, unPauseGame} from "components/game-reducer";
 import {resistingSettings} from "components/game/game-settings";
+import MaybeRewardForOpening from "components/game/game-reward-for-opening";
 import PointsShop from "components/game/points-shop";
+import {getIsTimeToGiveOpeningRewardWithCoolDown} from "components/game/game-tools";
+
+const minutesToMS = (minutes) => minutes * 60 * 1000;
+const coolDownTimeMS = minutesToMS(10);
 
 export function Game({state = createState(), seed = Date.now()}) {
   const [gameState, setGameState] = useState({
@@ -29,13 +32,20 @@ export function Game({state = createState(), seed = Date.now()}) {
     timeSinceEpochMS: Date.now(),
     startTime: Date.now(),
   });
-  //TODO make it random every time it opens on cooldown
-  const shouldShowRewardForOpeningApp = true;
+
+  const [
+    isMaybeRewardShownForOpeningApp,
+    setIsMaybeRewardShownForOpeningApp,
+  ] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+
   function dispatch(event) {
     setGameState((gameState) => reduceGameState(gameState, event));
   }
-  const setupTimeEffect = () => {
-    const timer = setInterval(() => {
+
+  const isTimerRunning = true;
+  useInterval(
+    () => {
       dispatch({
         type: "HANDLE_UNRELIABLE_TIME_TICK",
         timeSinceEpochMS: Date.now(),
@@ -45,12 +55,9 @@ export function Game({state = createState(), seed = Date.now()}) {
           doNothing,
         },
       });
-    }, gameState.millisecondsPerTick);
-
-    return () => {
-      clearInterval(timer);
-    };
-  };
+    },
+    isTimerRunning ? gameState.millisecondsPerTick : null,
+  );
 
   const saveEverySecondEffect = () => {
     const timer = setInterval(() => {
@@ -66,9 +73,30 @@ export function Game({state = createState(), seed = Date.now()}) {
       property: "isFocusModeEnabled",
       value: true,
     });
+    dispatch({
+      type: "GIVE_RANDOM_OPENING_REWARD",
+    });
   };
 
-  useEffect(setupTimeEffect, [gameState.millisecondsPerTick]);
+  const isTimeToGiveReward = getIsTimeToGiveOpeningRewardWithCoolDown({
+    gameState: gameState,
+    coolDownTimeMS: coolDownTimeMS,
+  });
+  if (isTimeToGiveReward && isVisible) {
+    dispatch({
+      type: "GIVE_RANDOM_OPENING_REWARD",
+    });
+    dispatch({
+      type: "HANDLE_UNRELIABLE_TIME_TICK",
+      //This should not cause an infinite loop because timeSinceEpoch changes every MS
+      timeSinceEpochMS: Date.now() + 1,
+      timeFunctionDictionary: {
+        incrementProgress,
+        changeRandomReward,
+        doNothing,
+      },
+    });
+  }
   useEffect(startEffect, []);
   // useEffect(saveEverySecondEffect, []);
   // if (isPending) return "Loading...";
@@ -88,6 +116,7 @@ export function Game({state = createState(), seed = Date.now()}) {
         onChange={(isVisible1) => {
           const pauseOrUnpauseGame = isVisible1 ? unPauseGame() : pauseGame();
           dispatch(pauseOrUnpauseGame);
+          setIsVisible(isVisible1);
         }}
       ></PageVisibility>
 
@@ -115,6 +144,7 @@ export function Game({state = createState(), seed = Date.now()}) {
       >
         Tempted
       </button>
+
       <ActionProgress />
       <ProgressView
         gameState={gameState}
@@ -145,22 +175,23 @@ export function Game({state = createState(), seed = Date.now()}) {
           }}
         />
       </div>
-      {shouldShowRewardForOpeningApp ? (
-        <RewardForOpening gameState={gameState} />
-      ) : null}
-      <div>
-        {totalPoints > 0 ? `Points ${pointsRemaining}/${totalPoints}` : null}{" "}
-      </div>
-      <PointsShop
-        {...{
-          ...gameState,
-          ...allComputedProperties,
-          dispatch: dispatch,
-          onSpendAPoint: () => {
-            spendAPoint({dispatch: dispatch, gameState: gameState});
-          },
+      <MaybeRewardForOpening
+        gameState={gameState}
+        coolDownTimeMS={coolDownTimeMS}
+        rewardAmount={gameState.userActionPoints}
+        onRewardShown={() => {
+          setIsMaybeRewardShownForOpeningApp(true);
         }}
       />
+
+      <div>
+        {isMaybeRewardShownForOpeningApp
+          ? `Points ${pointsRemaining}/${totalPoints}`
+          : null}
+      </div>
+
+      <PricesOfUpgrades />
+      <PointsShop gameState={gameState} dispatch={dispatch} />
     </GameWrapper>
   );
 }
@@ -175,7 +206,26 @@ const GameWrapper = styled.div`
 
   border: 1px solid #1890ff;
 `;
-
+function PricesOfUpgrades({prices = {item: 0}}) {
+  return (
+    <>
+      <table>
+        <tr>
+          <th>Item</th>
+          <th>Cost</th>
+        </tr>
+        <tr>
+          <td>January</td>
+          <td>$100</td>
+        </tr>
+        <tr>
+          <td>February</td>
+          <td>$80</td>
+        </tr>
+      </table>
+    </>
+  );
+}
 function StorageControls() {
   return (
     <>

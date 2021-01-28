@@ -1,15 +1,16 @@
-import React, {useState, useEffect} from "react";
+import React from "react";
 
-export default function PointsShop({
-  onSpendAPoint,
-  dispatch,
+import {getComputedProperties, spendAPoint} from "components/game/game-tools";
 
-  totalPoints,
-  pointsRemaining,
-  lastReward,
-  totalReward,
-  isWaitingForReward,
-}) {
+export default function PointsShop({gameState, dispatch}) {
+  const computedProperties = getComputedProperties(gameState);
+  const {
+    totalPoints,
+    pointsRemaining,
+    lastReward,
+    totalReward,
+    isWaitingForReward,
+  } = {...gameState, ...computedProperties};
   return (
     <div>
       <div>
@@ -42,7 +43,7 @@ export default function PointsShop({
       <button
         disabled={pointsRemaining < 1 || isWaitingForReward}
         onClick={() => {
-          onSpendAPoint();
+          spendAPoint({dispatch: dispatch, gameState: gameState});
         }}
       >
         Use Point

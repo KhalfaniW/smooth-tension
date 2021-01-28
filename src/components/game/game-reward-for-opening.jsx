@@ -1,17 +1,44 @@
-import {useTimeout} from "react-use";
-import React, {useState} from "react";
+import {useTimeout} from "ahooks";
+import React, {useEffect, useState} from "react";
+import parseMilliseconds from "parse-ms";
 
-export default function RewardForOpening({gameState, delay = 1000}) {
-  // useDelay
-  const [getIsReady, cancel] = useTimeout(delay);
+export default function MaybeRewardForOpening({
+  gameState,
+  onRewardShown,
+  coolDownTimeMS,
+}) {
+  //put reward on cooldown after opening
 
+  const timeSinceLastReward =
+    gameState.timeSinceEpochMS -
+    gameState.previousRewardForOpeningTimeSinceEpoch;
+  const has5SecondsPassedSinceReward = timeSinceLastReward > 5 * 1000;
+  const countDownToNextRandomRewardMS = coolDownTimeMS - timeSinceLastReward;
+  const timeLeft = parseMilliseconds(countDownToNextRandomRewardMS);
   return (
     <>
-      {getIsReady() ? (
-        <div>Reward: {gameState.userActionPoints}</div>
-      ) : (
-        <>Calculating...</>
-      )}
+      <ShowReward
+        rewardAmount={gameState.userActionPoints}
+        onRewardShown={onRewardShown}
+      />
+
+      {has5SecondsPassedSinceReward
+        ? `${timeLeft.minutes}m:${timeLeft.seconds}`
+        : null}
+    </>
+  );
+}
+
+function ShowReward({rewardAmount, delay = 1000, onRewardShown}) {
+  // useDelay
+  const [isDoneLoading, setIsDoneLoading] = useState(false);
+  useTimeout(() => {
+    setIsDoneLoading(true);
+    onRewardShown();
+  }, delay);
+  return (
+    <>
+      {isDoneLoading ? <div>Reward: {rewardAmount}</div> : <>Calculating...</>}
     </>
   );
 }
