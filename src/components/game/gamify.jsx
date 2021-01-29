@@ -32,11 +32,10 @@ export function Game({state = createState(), seed = Date.now()}) {
     timeSinceEpochMS: Date.now(),
     startTime: Date.now(),
   });
-
-  const [
-    isMaybeRewardShownForOpeningApp,
-    setIsMaybeRewardShownForOpeningApp,
-  ] = useState(false);
+  //TODO refractor previous with usePrevious for all properties not needed to be used by reducer
+  const [isRewardAnimationComplete, setIsRewardAnimationComplete] = useState(
+    false,
+  );
   const [isVisible, setIsVisible] = useState(true);
 
   function dispatch(event) {
@@ -103,15 +102,9 @@ export function Game({state = createState(), seed = Date.now()}) {
   const allComputedProperties = getComputedProperties(gameState);
   const {totalPoints, pointsRemaining} = allComputedProperties;
 
+  const [shouldRelease, setShouldRelease] = useState(false);
   return (
-    <GameWrapper
-      onMouseEnter={() => {
-        dispatch(unPauseGame());
-      }}
-      onMouseLeave={() => {
-        dispatch(pauseGame());
-      }}
-    >
+    <>
       <PageVisibility
         onChange={(isVisible1) => {
           const pauseOrUnpauseGame = isVisible1 ? unPauseGame() : pauseGame();
@@ -120,45 +113,55 @@ export function Game({state = createState(), seed = Date.now()}) {
         }}
       ></PageVisibility>
 
-      <StorageControls />
+      <GameWrapper
+        onMouseEnter={() => {
+          dispatch(unPauseGame());
+        }}
+        onMouseLeave={() => {
+          dispatch(pauseGame());
+        }}
+      >
+        <HoldOrReleaseCommand
+          shouldRelease={
+            allComputedProperties.lastReward > 0 &&
+            !allComputedProperties.isWaitingForReward
+          }
+        />
+        <PointsShop
+          gameState={gameState}
+          dispatch={dispatch}
+          shouldShowPoints={isRewardAnimationComplete}
+        />
+        <GainPointsUserActions gameState={gameState} dispatch={dispatch} />
+        <MaybeRewardForOpening
+          gameState={gameState}
+          coolDownTimeMS={coolDownTimeMS}
+          rewardAmount={gameState.userActionPoints}
+          onRewardShown={() => {
+            setIsRewardAnimationComplete(true);
+          }}
+        />
+      </GameWrapper>
+    </>
+  );
+}
+const GameWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 50px;
+  color: #444;
 
-      <button
-        onClick={() => {
-          dispatch({
-            type: "SET_VARIABLE",
-            property: "isFocusModeEnabled",
-            value: true,
-          });
-        }}
-      >
-        Start
-      </button>
-      <button
-        onClick={() => {
-          dispatch({
-            type: "SET_OBJECT",
-            property: "currentSettings",
-            value: resistingSettings,
-          });
-        }}
-      >
-        Tempted
-      </button>
-
-      <ActionProgress />
-      <ProgressView
-        gameState={gameState}
-        progressAmount={gameState.progressAmount}
-      />
-      <button
-        onClick={() => {
-          alert(JSON.stringify(gameState));
-        }}
-      >
-        show
-      </button>
+  border: 1px solid #1890ff;
+`;
+function GainPointsUserActions({gameState, dispatch}) {
+  return (
+    <>
       <div>
-        Block
+        <h2>Gain Points</h2>
+        <ActionProgress />
         <UserOneTimeActions
           actionList={getUserOneTimeActions(gameState)}
           onComplete={(itemSelected) => {
@@ -175,80 +178,44 @@ export function Game({state = createState(), seed = Date.now()}) {
           }}
         />
       </div>
-      <MaybeRewardForOpening
-        gameState={gameState}
-        coolDownTimeMS={coolDownTimeMS}
-        rewardAmount={gameState.userActionPoints}
-        onRewardShown={() => {
-          setIsMaybeRewardShownForOpeningApp(true);
-        }}
-      />
-
-      <div>
-        {isMaybeRewardShownForOpeningApp
-          ? `Points ${pointsRemaining}/${totalPoints}`
-          : null}
-      </div>
-
-      <PricesOfUpgrades />
-      <PointsShop gameState={gameState} dispatch={dispatch} />
-    </GameWrapper>
+    </>
   );
 }
-const GameWrapper = styled.div`
+
+function HoldOrReleaseCommand({shouldRelease}) {
+  if (shouldRelease) {
+    return (
+      <>
+        <ReleaseTensionBox>
+          <h2>Release Tension</h2>
+        </ReleaseTensionBox>
+      </>
+    );
+  }
+  return (
+    <>
+      <HoldTensionBox>
+        <h2>Hold Tension</h2>
+      </HoldTensionBox>
+    </>
+  );
+}
+const HoldTensionBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   width: 100%;
-  padding: 50px;
   color: #444;
-
-  border: 1px solid #1890ff;
+  border: 1px solid red;
 `;
-function PricesOfUpgrades({prices = {item: 0}}) {
-  return (
-    <>
-      <table>
-        <tr>
-          <th>Item</th>
-          <th>Cost</th>
-        </tr>
-        <tr>
-          <td>January</td>
-          <td>$100</td>
-        </tr>
-        <tr>
-          <td>February</td>
-          <td>$80</td>
-        </tr>
-      </table>
-    </>
-  );
-}
-function StorageControls() {
-  return (
-    <>
-      <button
-        onClick={() => {
-          /* saveState({storageSettings: stateStorageSettings, value: gameState}); */
-        }}
-      >
-        Save
-      </button>
-      <br /> <br /> <br />
-      <button
-        onClick={() => {
-          /* retrieveStoredState({ */
-          /*   storageSettings: stateStorageSettings, */
-          /*   defaultValue: createState(), */
-          /* }) */
-          /*   .then((retreivedState) => retreivedState) */
-          /*   .then((retreivedState) => setGameState(JSON.parse(retreivedState))); */
-        }}
-      >
-        Load
-      </button>
-    </>
-  );
-}
+
+const ReleaseTensionBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  color: #444;
+  border: 1px solid blue;
+`;

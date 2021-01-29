@@ -38,7 +38,11 @@ function ShowReward({rewardAmount, delay = 1000, onRewardShown}) {
   }, delay);
   return (
     <>
-      {isDoneLoading ? <div>Reward: {rewardAmount}</div> : <>Calculating...</>}
+      {isDoneLoading ? (
+        <div>Opening Reward: {rewardAmount}</div>
+      ) : (
+        <>Calculating...</>
+      )}
     </>
   );
 }

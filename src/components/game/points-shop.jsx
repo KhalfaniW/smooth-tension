@@ -2,7 +2,7 @@ import React from "react";
 
 import {getComputedProperties, spendAPoint} from "components/game/game-tools";
 
-export default function PointsShop({gameState, dispatch}) {
+export default function PointsShop({gameState, dispatch, shouldShowPoints}) {
   const computedProperties = getComputedProperties(gameState);
   const {
     totalPoints,
@@ -13,6 +13,9 @@ export default function PointsShop({gameState, dispatch}) {
   } = {...gameState, ...computedProperties};
   return (
     <div>
+      <div>
+        {shouldShowPoints ? `Points ${pointsRemaining}/${totalPoints}` : null}
+      </div>
       <div>
         {isWaitingForReward
           ? `Calculating progress Addendum`
