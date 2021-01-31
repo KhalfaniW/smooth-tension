@@ -62,6 +62,18 @@ export function reduceGameState(state, action) {
         break;
       case "GIVE_RANDOM_OPENING_REWARD":
         return changeRandomReward(draftState);
+      case "BEGIN_WAITING_FOR_REWARD":
+        draftState.isWaitingForReward = true;
+        break;
+      case "END_WAITING_FOR_REWARD":
+        draftState.isWaitingForReward = false;
+        break;
+      case "BEGIN_WAITING_TO_HIDE_REWARD_CREATOR":
+        draftState.isWaitingToHideRewardCreator = true;
+        break;
+      case "END_WAITING_TO_HIDE_REWARD_CREATOR":
+        draftState.isWaitingToHideRewardCreator = false;
+        break;
 
       case "TOGGLE_BOOLEAN":
         draftState[action.property] = !draftState[action.property];
@@ -80,10 +92,12 @@ export function createGameState(seed = 5) {
     userActionPoints: 0,
     initialReward: 0,
     isRandomRewardChecked: false,
+    isWaitingToHideRewardCreator: false,
     progressAmount: 0,
     defaultIncrementInterval: 1000,
     incrementAmount: 0.1,
     speedMultiplier: 1,
+    isWaitingForReward: false,
     isVisible: true,
     pointsUsed: 0,
     previousRewardForOpeningTimeSinceEpoch: 0,

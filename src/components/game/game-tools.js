@@ -9,6 +9,13 @@ export function getUserOneTimeActions(state) {
     state.currentSettings.userActionsValueDictionary.oneTimeActions,
   );
 }
+
+export function getUserOneTimeActionValues(state) {
+  return getUserOneTimeActions(state).map((actionName) =>
+    getUserOneTimeActionValue({state, itemName: actionName}),
+  );
+}
+
 export function getUserOneTimeActionValue({state, itemName}) {
   return state.currentSettings.userActionsValueDictionary.oneTimeActions[
     itemName
@@ -35,47 +42,19 @@ export function getComputedProperties(gameState) {
     property: "totalReward",
   });
 
-  const isWaitingForReward = getIsEventPending({
-    state: gameState,
-    id: "WAIT_TO_SHOW_REWARD_ID",
-  });
-
+  const lastReward = gameState.totalReward - previousTotalReward;
   if (pointsRemaining < 0) {
     throw new Error("Used more points then available");
   }
   return {
     totalPoints,
     pointsRemaining,
-    isWaitingForReward,
     previousTotalReward,
-    lastReward: gameState.totalReward - previousTotalReward,
+    lastReward,
+    hasRecentlyWon: lastReward > 0,
   };
 }
-export function spendAPoint({gameState, dispatch}) {
-  dispatch({
-    type: "ADD_ONE_TIME_EVENT",
-    oneTimeEvent: createOneTimeEvent({
-      id: "WAIT_TO_SHOW_REWARD_ID",
-      runTime: gameState.millisecondsPassed + 1000,
-      functionName: "doNothing",
-    }),
-  });
-  dispatch({
-    type: "USE_A_POINT",
-  });
 
-  dispatch({
-    type: "UPDATE_SEED",
-  });
-
-  const shouldGiveRandomReward = getShouldGiveRandomReward({
-    probabilityDecimal: 0.5,
-    seed: gameState.seed,
-  });
-
-  const rewardAddition = shouldGiveRandomReward ? 1 : 0;
-  dispatch(changeRewardAction(gameState.totalReward + rewardAddition));
-}
 export function doNothing(gameState) {
   return gameState;
 }

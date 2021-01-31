@@ -1,16 +1,23 @@
 import React from "react";
 
-import {getComputedProperties, spendAPoint} from "components/game/game-tools";
+import {
+  changeRewardAction,
+  getComputedProperties,
+  getShouldGiveRandomReward,
+} from "components/game/game-tools";
 
 export default function PointsShop({gameState, dispatch, shouldShowPoints}) {
   const computedProperties = getComputedProperties(gameState);
   const {
+    isWaitingForReward,
     totalPoints,
     pointsRemaining,
     lastReward,
     totalReward,
-    isWaitingForReward,
-  } = {...gameState, ...computedProperties};
+  } = {
+    ...gameState,
+    ...computedProperties,
+  };
   return (
     <div>
       <div>
@@ -23,34 +30,32 @@ export default function PointsShop({gameState, dispatch, shouldShowPoints}) {
 \n           last reward ${lastReward}`}
       </div>
       <button
-        onClick={() => {
-          dispatch({
-            type: "INCREASE_PROGRESS_INCREMENT_SPEED",
-            amount: 0.5,
-          });
-        }}
-      >
-        Increase by .1
-      </button>
-      <button
-        disabled={pointsRemaining < 1}
-        onClick={() => {
-          dispatch({
-            type: "USE_POINTS",
-            amount: 1,
-          });
-        }}
-      >
-        Invest Point
-      </button>
-      <button
-        disabled={pointsRemaining < 1 || isWaitingForReward}
+        disabled={pointsRemaining < 1 || gameState.isWaitingToHideRewardCreator}
         onClick={() => {
           spendAPoint({dispatch: dispatch, gameState: gameState});
+          dispatch({type: "BEGIN_WAITING_FOR_REWARD"});
+          dispatch({type: "BEGIN_WAITING_TO_HIDE_REWARD_CREATOR"});
         }}
       >
         Use Point
       </button>
     </div>
   );
+}
+function spendAPoint({gameState, dispatch}) {
+  dispatch({
+    type: "USE_A_POINT",
+  });
+
+  dispatch({
+    type: "UPDATE_SEED",
+  });
+
+  const shouldGiveRandomReward = getShouldGiveRandomReward({
+    probabilityDecimal: 0.5,
+    seed: gameState.seed,
+  });
+
+  const rewardAddition = shouldGiveRandomReward ? 1 : 0;
+  dispatch(changeRewardAction(gameState.totalReward + rewardAddition));
 }

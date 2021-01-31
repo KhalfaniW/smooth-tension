@@ -101,7 +101,8 @@ export function timeReducer(state, action) {
 export function createTimerState() {
   return {
     millisecondsPassed: 0,
-    millisecondsPerTick: 50,
+    //keep millisecondsPerTick high or mobile performance will suffer
+    millisecondsPerTick: 1000,
     oneTimeEvents: [],
     intervalEvents: [],
     timeSinceEpochMS: 0,
