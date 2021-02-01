@@ -2,15 +2,19 @@ export const changeSpeed = (value) => value;
 
 export const obtainSettings = () => {
   return {
+    probabiltyOfWinPercentDecimal: 0.4,
+    animationConfig: {
+      minNumberToShow: 1,
+      maxNumberToShow: 10,
+    },
     userActionsValueDictionary: {
       oneTimeActions: {
         "Close distracting websites: YouTube.com etc": 2,
-        "Identify next action": 2 /*make it specific, easy, able to do now if not break it inot smaller steps*/,
-        "Breath 10 seconds in 10 seconds out": 1,
-        "Start 2 minute exercise": 0.2,
+        "Identify next action": 2 /*make next action specific, easy, able to do now if not break it inot smaller steps*/,
+
+        "Hold Negative motions Breath 10 seconds in 10 seconds out": 1,
         "Do heart rate breathing 10s": 1,
         "Open Scheduler Or Habit App": 0.5,
-        "Start 15 minute exercise": 2.2,
         "Go to working location": 1,
       },
       physicalState: {

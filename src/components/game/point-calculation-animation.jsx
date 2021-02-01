@@ -3,131 +3,61 @@ import NumberFormat from "react-number-format";
 import React, {useEffect, useState} from "react";
 
 import {getComputedProperties} from "components/game/game-tools";
-import {getRandomIntInclusive} from "components/random-reducer";
+import {getRandomBoolean} from "components/random-reducer";
+import {getWinOrLossMeaningConfig} from "components/game/animation-tools";
 
+export const PointAnimationDisplayBox = ({children}) => (
+  <div className="border h-40 w-60">{children}</div>
+);
 export default function PointCalculationAnimation({gameState, dispatch}) {
-  const {hasRecentlyWon, lastReward} = getComputedProperties(gameState);
-
+  const {hasRecentlyWon} = getComputedProperties(gameState);
+  const keyForResettingAnimation = gameState.pointAnimationCount;
   return (
     <>
-      {gameState.isWaitingForReward ||
-      gameState.isWaitingToHideRewardCreator ? (
-        <PointCalculationAnimationView
-          isWin={hasRecentlyWon}
-          seed={gameState.seed}
-          onAnimationStart={() => {}}
-          onAnimationEnd={() => {
-            dispatch({type: "END_WAITING_FOR_REWARD"});
-          }}
-          onFinishedShowing={() => {
-            dispatch({type: "END_WAITING_TO_HIDE_REWARD_CREATOR"});
-          }}
-        />
-      ) : null}
+      <PointAnimationDisplayBox>
+        {gameState.pointAnimationCount > 0 ? (
+          <PointCalculationAnimationView
+            isWin={hasRecentlyWon}
+            isCloseLoss={
+              getRandomBoolean({
+                probabilityOfTrue: 0.4,
+                seed: gameState.seed,
+              }) && !hasRecentlyWon
+            }
+            seed={gameState.seed}
+            key={keyForResettingAnimation}
+            animationConfig={gameState.currentSettings.animationConfig}
+            onAnimationStart={() => {}}
+            onAnimationEnd={() => {
+              dispatch({type: "END_WAITING_FOR_REWARD"});
+            }}
+            onFinishedShowing={() => {
+              dispatch({type: "END_WAITING_TO_HIDE_REWARD_CREATOR"});
+            }}
+          />
+        ) : null}
+      </PointAnimationDisplayBox>
     </>
   );
 }
-
-function RandomRewardAnimation({isWin, seed, onAnimationEnd}) {
-  const [isFinished, setIsFinished] = useState(false);
-  function handleRest() {
-    if (!isFinished) {
-      onAnimationEnd();
-      // only run onRest once
-      setIsFinished(true);
-    }
-  }
-
-  const finalRandomNumber = getRandomIntInclusive({
-    max: 99,
-    min: 1,
-    seed: seed,
-  });
-
-  const makeEven = (n) => (n % 2 === 0 ? n : n + 1);
-  const makeOdd = (n) => makeEven(n) - 1;
-  const finalNumber = isWin
-    ? makeEven(finalRandomNumber)
-    : makeOdd(finalRandomNumber);
-
-  const getRandomNumberView = ({number, isNumberAWin}) => {
-    return (
-      <div className="border m-4 rounded">
-        {isNumberAWin ? (
-          <div className="bg-green-300 rounded">{number}</div>
-        ) : (
-          <div className="bg-red-300 rounded">{number}</div>
-        )}
-      </div>
-    );
-  };
-  return (
-    <>
-      <Spring
-        from={{number: 0}} //change to 0
-        to={{number: 100}}
-        onRest={handleRest}
-        config={{friction: 25, tension: 35, clamp: true}}
-      >
-        {(props) => {
-          const percentComplete = Number(props.number.toFixed(1));
-          const isCloseToEnd = percentComplete > 97;
-          const numberToShow =
-            percentComplete === 100
-              ? finalNumber
-              : getRandomIntInclusive({
-                  max: 100,
-                  min: 10, //min 0 to maintain equal spacig
-                  // if you take more decimals it jump around too quickly
-                  seed: percentComplete + seed,
-                });
-
-          return (
-            <>
-              {isCloseToEnd ? (
-                getRandomNumberView({
-                  number: numberToShow,
-                  isNumberAWin: numberToShow % 2 === 0,
-                })
-              ) : (
-                <div>{numberToShow}</div>
-              )}
-              <div>
-                {
-                  <NumberFormat
-                    value={percentComplete}
-                    displayType={"text"}
-                  ></NumberFormat>
-                }
-                / 100
-              </div>
-            </>
-          );
-        }}
-      </Spring>
-    </>
-  );
-}
-function RandomNumberRollView({number}) {}
 
 function PointCalculationAnimationView({
-  isWin = true,
-  seed = 93,
+  isWin,
+  isCloseLoss,
+  seed,
+  animationConfig,
   delayAfterLoading = 1500,
   onAnimationStart = () => {},
   onAnimationEnd = () => {},
   onFinishedShowing = () => {},
 }) {
-  const [isAnimationComplete, setIsAnimationComplete] = useState(false);
-
   useEffect(() => {
     onAnimationStart();
     return () => {};
-  }, []);
+  }, [onAnimationStart]);
 
   function handleAnimationEnd() {
     onAnimationEnd();
-    setIsAnimationComplete(true);
     setTimeout(() => {
       onFinishedShowing();
     }, delayAfterLoading);
@@ -135,15 +65,122 @@ function PointCalculationAnimationView({
 
   return (
     <>
-      <>
-        <RandomRewardAnimation
-          seed={seed}
-          isWin={isWin}
-          onAnimationEnd={handleAnimationEnd}
-        />
-      </>
-
-      {isAnimationComplete ? isWin ? <>Win</> : <>Try again</> : null}
+      <RandomRewardAnimation
+        seed={seed}
+        isWin={isWin}
+        isCloseLoss={isCloseLoss}
+        onAnimationEnd={handleAnimationEnd}
+        maxNumberToShow={animationConfig.maxNumberToShow}
+        minNumberToShow={animationConfig.minNumberToShow}
+      />
     </>
+  );
+}
+const animationPercentEnd = 100,
+  animationPercentStart = 0,
+  animationPercentTotal = animationPercentEnd - animationPercentStart,
+  animationPercentStep = 0.1;
+
+function RandomRewardAnimation({
+  isWin,
+  seed,
+  onAnimationEnd,
+  maxNumberToShow,
+  minNumberToShow,
+  isCloseLoss,
+}) {
+  const [isFinished, setIsFinished] = useState(false);
+
+  const {
+    getIsNumberAWinningNumber,
+    getNumberToShowFromPercentComplete,
+    winningNumberMessage,
+    losingNumberMessage,
+  } = getWinOrLossMeaningConfig({
+    minNumber: minNumberToShow,
+    maxNumber: maxNumberToShow,
+    isWin: isWin,
+    isCloseLoss,
+    animationPercentStep,
+    seed,
+  });
+
+  function handleRest() {
+    if (!isFinished) {
+      onAnimationEnd();
+      // only run onRest once
+      setIsFinished(true);
+    }
+  }
+  return (
+    <>
+      <Spring
+        from={{number: animationPercentStart}} //change to 0
+        to={{number: animationPercentEnd}}
+        onRest={handleRest}
+        config={{friction: 25, tension: 35, clamp: true}}
+      >
+        {(props) => {
+          // if you take more decimals than 1 it will jump around too quickly
+          const percentComplete = Number(props.number.toFixed(1));
+          const numberToShow = getNumberToShowFromPercentComplete({
+            seed: seed,
+            percentComplete: percentComplete,
+          });
+
+          return (
+            <>
+              <RandomNumberView
+                number={numberToShow}
+                percentComplete={percentComplete}
+                isNumberAWin={getIsNumberAWinningNumber(numberToShow)}
+              />
+              <RandomNumberSpinProgressView percentComplete={percentComplete} />
+            </>
+          );
+        }}
+      </Spring>
+      {isFinished ? (isWin ? winningNumberMessage : losingNumberMessage) : null}
+    </>
+  );
+}
+
+function RandomNumberView({number, isNumberAWin, percentComplete}) {
+  const isCloseToEnd = percentComplete > 97;
+  const numberAsString = number.toString();
+  const numberToShow = number < 10 ? "0" + numberAsString : numberAsString;
+
+  return (
+    <div className="border m-4 rounded">
+      {isCloseToEnd ? (
+        isNumberAWin ? (
+          <div className="bg-green-300 rounded">{numberToShow}</div>
+        ) : (
+          <div className="bg-red-300 rounded">{numberToShow}</div>
+        )
+      ) : (
+        <div className="rounded">{numberToShow}</div>
+      )}
+    </div>
+  );
+}
+
+function RandomNumberSpinProgressView({percentComplete}) {
+  return (
+    <div>
+      <div className="w-full h-5 overflow-hidden rounded-lg bg-gray-300">
+        <div
+          className="h-full  bg-blue-400"
+          style={{width: `${percentComplete}%`}}
+        ></div>
+      </div>
+      {
+        <NumberFormat
+          value={percentComplete}
+          displayType={"text"}
+        ></NumberFormat>
+      }
+      / 100
+    </div>
   );
 }

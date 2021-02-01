@@ -1,7 +1,10 @@
 import produce from "immer";
 
-import {createOneTimeEvent, getIsEventPending} from "components/time-reducer";
-import {getRandomIntInclusive, randomReducer} from "components/random-reducer";
+import {
+  getRandomBoolean,
+  getRandomIntInclusive,
+  randomReducer
+} from 'components/random-reducer';
 import {reduceGameState} from "components/game-reducer";
 
 export function getUserOneTimeActions(state) {
@@ -148,12 +151,5 @@ export function getShouldGiveRandomRewardFromState({
 }
 
 export function getShouldGiveRandomReward({probabilityDecimal, seed}) {
-  const max = 1000;
-  const minimumAcceptable = probabilityDecimal * max;
-  const randomNumberBetween1and100 = getRandomIntInclusive({
-    min: 1,
-    max: max,
-    seed: seed,
-  });
-  return randomNumberBetween1and100 < minimumAcceptable;
+  return getRandomBoolean({probabilityOfTrue: probabilityDecimal, seed});
 }

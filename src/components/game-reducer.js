@@ -64,6 +64,7 @@ export function reduceGameState(state, action) {
         return changeRandomReward(draftState);
       case "BEGIN_WAITING_FOR_REWARD":
         draftState.isWaitingForReward = true;
+        draftState.pointAnimationCount++;
         break;
       case "END_WAITING_FOR_REWARD":
         draftState.isWaitingForReward = false;
@@ -95,6 +96,7 @@ export function createGameState(seed = 5) {
     isWaitingToHideRewardCreator: false,
     progressAmount: 0,
     defaultIncrementInterval: 1000,
+    pointAnimationCount: 0,
     incrementAmount: 0.1,
     speedMultiplier: 1,
     isWaitingForReward: false,
