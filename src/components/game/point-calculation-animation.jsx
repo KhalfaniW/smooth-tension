@@ -1,7 +1,7 @@
 import {Spring} from "react-spring/renderprops";
 import NumberFormat from "react-number-format";
 import React, {useEffect, useState} from "react";
-
+import {range} from "lodash";
 import {getComputedProperties} from "components/game/game-tools";
 import {getRandomBoolean} from "components/random-reducer";
 import {getWinOrLossMeaningConfig} from "components/game/animation-tools";
@@ -122,7 +122,7 @@ function RandomRewardAnimation({
       >
         {(props) => {
           // if you take more decimals than 1 it will jump around too quickly
-          const percentComplete = Number(props.number.toFixed(1));
+          const percentComplete = Number(props.number.toFixed(1)) / 100;
           const numberToShow = getNumberToShowFromPercentComplete({
             seed: seed,
             percentComplete: percentComplete,
@@ -135,7 +135,12 @@ function RandomRewardAnimation({
                 percentComplete={percentComplete}
                 isNumberAWin={getIsNumberAWinningNumber(numberToShow)}
               />
-              <RandomNumberSpinProgressView percentComplete={percentComplete} />
+              <RandomNumberSpinProgressView
+                previousPercentComplete={
+                  percentComplete - 0.001 < 0 ? 0 : percentComplete - 0.001
+                }
+                percentComplete={percentComplete}
+              />
             </>
           );
         }}
@@ -146,7 +151,8 @@ function RandomRewardAnimation({
 }
 
 function RandomNumberView({number, isNumberAWin, percentComplete}) {
-  const isCloseToEnd = percentComplete > 97;
+  const percentOutOf100 = percentComplete * 100;
+  const isCloseToEnd = percentOutOf100 > 97;
   const numberAsString = number.toString();
   const numberToShow = number < 10 ? "0" + numberAsString : numberAsString;
 
@@ -164,19 +170,66 @@ function RandomNumberView({number, isNumberAWin, percentComplete}) {
     </div>
   );
 }
+function percentToScaledProgress(percentComplete, limit = 0.9) {
+  const lowerLimit = 0.99;
+  const endBefore = 0.9;
 
-function RandomNumberSpinProgressView({percentComplete}) {
+  //TODO generalize this it don't work for any other number
+  const scaledProgressToLowerLimit = percentComplete * endBefore;
+  const stepsBetween = (1 - lowerLimit) / 0.001;
+  let percentCompleteToShow;
+  if (percentComplete < lowerLimit) {
+    percentCompleteToShow = scaledProgressToLowerLimit;
+  } else {
+    const distanceBetween = 1 - percentComplete;
+    percentCompleteToShow = 1 - distanceBetween * stepsBetween;
+  }
+
+  return percentCompleteToShow;
+}
+function getNextStep({
+  currentPercentShown,
+  currentPercent,
+  newPercent,
+  max,
+  shownMax,
+}) {
+  const shownDistanceToEnd = shownMax - currentPercentShown,
+    realStep = newPercent - currentPercent,
+    realOldDistanceToEnd = max - currentPercent,
+    stepsToShow = realOldDistanceToEnd / realStep;
+
+  const nextShownStep = shownDistanceToEnd / stepsToShow;
+
+  return currentPercentShown + nextShownStep;
+}
+function RandomNumberSpinProgressView({
+  previousPercentComplete,
+  percentComplete,
+}) {
+  //TODO extract this logic
+
+  const currentMax = percentComplete >= 0.99 ? 1 : 0.9;
+  const newValue = getNextStep({
+    max: 1,
+    currentPercentShown: previousPercentComplete,
+    currentPercent: percentComplete * currentMax,
+    newPercent: percentComplete,
+    shownMax: percentComplete * currentMax,
+  });
+  // const percentCompleteToShow = percentToScaledProgress(percentComplete);
+
   return (
     <div>
       <div className="w-full h-5 overflow-hidden rounded-lg bg-gray-300">
         <div
           className="h-full  bg-blue-400"
-          style={{width: `${percentComplete}%`}}
+          style={{width: `${newValue * 100}%`}}
         ></div>
       </div>
       {
         <NumberFormat
-          value={percentComplete}
+          value={percentComplete * 100}
           displayType={"text"}
         ></NumberFormat>
       }

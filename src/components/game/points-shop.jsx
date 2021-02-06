@@ -9,10 +9,11 @@ import {
 export default function PointsShop({gameState, dispatch, shouldShowPoints}) {
   const computedProperties = getComputedProperties(gameState);
   const {
-    isWaitingForReward,
+    isWaitingForRewardWheel,
     totalPoints,
     pointsRemaining,
     lastReward,
+    isSpinningDisabled,
     totalReward,
   } = {
     ...gameState,
@@ -20,25 +21,23 @@ export default function PointsShop({gameState, dispatch, shouldShowPoints}) {
   };
   return (
     <div>
+      <div>{`Spins Remaining ${pointsRemaining}`}</div>
       <div>
-        {shouldShowPoints ? `Points ${pointsRemaining}/${totalPoints}` : null}
+        {pointsRemaining === 0 ? (
+          `Get spins by completing actions below `
+        ) : (
+          <button
+            disabled={isSpinningDisabled}
+            onClick={() => {
+              spendAPoint({dispatch: dispatch, gameState: gameState});
+              dispatch({type: "BEGIN_WAITING_FOR_REWARD"});
+              dispatch({type: "BEGIN_WAITING_TO_HIDE_REWARD_CREATOR"});
+            }}
+          >
+            Spin Wheel
+          </button>
+        )}
       </div>
-      <div>
-        {isWaitingForReward
-          ? `Calculating progress Addendum`
-          : ` Total ${totalReward}/3  
-\n           last reward ${lastReward}`}
-      </div>
-      <button
-        disabled={pointsRemaining < 1 || gameState.isWaitingToHideRewardCreator}
-        onClick={() => {
-          spendAPoint({dispatch: dispatch, gameState: gameState});
-          dispatch({type: "BEGIN_WAITING_FOR_REWARD"});
-          dispatch({type: "BEGIN_WAITING_TO_HIDE_REWARD_CREATOR"});
-        }}
-      >
-        Use Point
-      </button>
     </div>
   );
 }

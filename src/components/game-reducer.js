@@ -63,19 +63,39 @@ export function reduceGameState(state, action) {
       case "GIVE_RANDOM_OPENING_REWARD":
         return changeRandomReward(draftState);
       case "BEGIN_WAITING_FOR_REWARD":
-        draftState.isWaitingForReward = true;
+        draftState.isWaitingForRewardWheel = true;
         draftState.pointAnimationCount++;
         break;
       case "END_WAITING_FOR_REWARD":
-        draftState.isWaitingForReward = false;
+        draftState.isWaitingForRewardWheel = false;
         break;
       case "BEGIN_WAITING_TO_HIDE_REWARD_CREATOR":
-        draftState.isWaitingToHideRewardCreator = true;
+        draftState.isWaitingToHideWheel = true;
         break;
       case "END_WAITING_TO_HIDE_REWARD_CREATOR":
-        draftState.isWaitingToHideRewardCreator = false;
+        draftState.isWaitingToHideWheel = false;
+        break;
+      case "END_GAME":
+        draftState.isComplete = true;
+        break;
+      case "RESET_GAME":
+        return initializeState({
+          emptyGameState: createGameState(),
+          gameSettings: state.currentSettings,
+          now: action.now,
+        });
+      case "INCREASE_POINTS":
+        draftState.userActionPoints += action.amount;
         break;
 
+      case "COMPLETE_USER_ACTION":
+        let newState3 = produce(oldState, (draftState) => {
+          draftState.userActions[action.name].isComplete = true;
+        });
+        return reduceGameState(newState3, {
+          type: "INCREASE_POINTS",
+          amount: newState3.userActions[action.name].value,
+        });
       case "TOGGLE_BOOLEAN":
         draftState[action.property] = !draftState[action.property];
         break;
@@ -85,21 +105,53 @@ export function reduceGameState(state, action) {
     }
   });
 }
+export function initializeState({emptyGameState, gameSettings, now}) {
+  let gameState = {
+    ...emptyGameState,
+    currentSettings: {...gameSettings},
+    progressAmount: 0,
+    seed: now,
+    timeSinceEpochMS: now,
+    startTime: now,
+  };
+  const actionValues = gameSettings.userActionsValueDictionary.oneTimeActions;
+  const userActionList = Object.keys(actionValues);
+
+  const userActionMap = userActionList.reduce((actionMap, action) => {
+    return {
+      ...actionMap,
+      [action]: {isComplete: false, value: actionValues[action]},
+    };
+  }, {});
+  gameState.userActions = userActionMap;
+
+  gameState = reduceGameState(gameState, {
+    type: "SET_VARIABLE",
+    property: "isFocusModeEnabled",
+    value: true,
+  });
+
+  return gameState;
+}
+
 export function createGameState(seed = 5) {
   return {
     ...createRandomSeedState(seed),
     ...createTimerState(),
     totalReward: 0,
     userActionPoints: 0,
+    isComplete: false,
+    isTimerRunning: false,
     initialReward: 0,
     isRandomRewardChecked: false,
-    isWaitingToHideRewardCreator: false,
+    isWaitingToHideWheel: false,
     progressAmount: 0,
     defaultIncrementInterval: 1000,
     pointAnimationCount: 0,
     incrementAmount: 0.1,
     speedMultiplier: 1,
-    isWaitingForReward: false,
+    userActions: {},
+    isWaitingForRewardWheel: false,
     isVisible: true,
     pointsUsed: 0,
     previousRewardForOpeningTimeSinceEpoch: 0,

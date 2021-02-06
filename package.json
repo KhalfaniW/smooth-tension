@@ -69,8 +69,9 @@
     "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
     "start": "npm run build:style && react-scripts start",
     "test": "react-scripts test",
-    "start2": "npm run build:style & PORT=4000 react-scripts start",
-    "build": "npm run build:style && react-scripts build"
+    "start2": "PORT=4000 npm run start",
+      "build": "npm run build:style && react-scripts build",
+    "test-debug": "jest"
   },
   "eslintConfig": {
     "extends": [

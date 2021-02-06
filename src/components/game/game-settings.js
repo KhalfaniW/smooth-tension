@@ -3,9 +3,10 @@ export const changeSpeed = (value) => value;
 export const obtainSettings = () => {
   return {
     probabiltyOfWinPercentDecimal: 0.4,
+    openRewardValue: 2,
     animationConfig: {
       minNumberToShow: 1,
-      maxNumberToShow: 10,
+      maxNumberToShow: 18,
     },
     userActionsValueDictionary: {
       oneTimeActions: {
@@ -16,11 +17,6 @@ export const obtainSettings = () => {
         "Do heart rate breathing 10s": 1,
         "Open Scheduler Or Habit App": 0.5,
         "Go to working location": 1,
-      },
-      physicalState: {
-        "Sit in active position": changeSpeed(0.5),
-        "Do breathing exercise": changeSpeed(1.5),
-        "Relax body | No shaking": changeSpeed(0.5),
       },
     },
   };

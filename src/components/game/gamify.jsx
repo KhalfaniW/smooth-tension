@@ -1,6 +1,6 @@
 import {useInterval} from "ahooks";
 import PageVisibility from "react-page-visibility";
-import React, {useState, useEffect} from "react";
+import React, {useState} from "react";
 
 import {ActionProgress} from "components/game/game-progress";
 import {GameWrapper, HoldTensionBox, ReleaseTensionBox} from "styles/boxes";
@@ -10,14 +10,19 @@ import {
   changeUserPointsAction,
   doNothing,
   getComputedProperties,
-  getIsTimeToGiveOpeningRewardWithCoolDown,
   getUserOneTimeActionValue,
   getUserOneTimeActionValues,
   getUserOneTimeActions,
   incrementProgress,
 } from "components/game/game-tools";
-import {createState} from "components/game/game-initializer";
-import {pauseGame, reduceGameState, unPauseGame} from "components/game-reducer";
+import {
+  createGameState,
+  initializeState,
+  pauseGame,
+  reduceGameState,
+  unPauseGame,
+} from "components/game-reducer";
+import {obtainSettings} from "components/game/game-settings";
 import MaybeRewardForOpening from "components/game/game-reward-for-opening";
 import PointCalculationAnimation from "components/game/point-calculation-animation";
 import PointsShop from "components/game/points-shop";
@@ -25,95 +30,56 @@ import PointsShop from "components/game/points-shop";
 const minutesToMS = (minutes) => minutes * 60 * 1000;
 const coolDownTimeMS = minutesToMS(10);
 const rewardDelayAnimationTime = 1000;
-export function Game({state = createState(), seed = Date.now()}) {
-  const [gameState, setGameState] = useState({
-    ...state,
-    seed: seed,
-    timeSinceEpochMS: Date.now(),
-    startTime: Date.now(),
-  });
+//reset should  be a level above to remount and reset effects
+export function Game({
+  state = initializeState({
+    now: Date.now(),
+    emptyGameState: createGameState(),
+    gameSettings: obtainSettings(),
+  }),
+
+  seed = Date.now(),
+}) {
+  const [gameState, setGameState] = useState(state);
   //TODO refractor previous with usePrevious for all properties not needed to be used by reducer
-  const [
-    isInititialRewardAnimationComplete,
-    setIsRewardAnimationComplete,
-  ] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
 
   function dispatch(event) {
     setGameState((gameState) => reduceGameState(gameState, event));
   }
 
-  const isTimerRunning = true;
-  useInterval(
-    () => {
-      dispatch({
-        type: "HANDLE_UNRELIABLE_TIME_TICK",
-        timeSinceEpochMS: Date.now(),
-        timeFunctionDictionary: {
-          incrementProgress,
-          changeRandomReward,
-          doNothing,
-        },
-      });
-    },
-    isTimerRunning ? gameState.millisecondsPerTick : null,
-  );
-
-  const saveEverySecondEffect = () => {
-    const timer = setInterval(() => {
-      // saveState({storageSettings: stateStorageSettings, value: gameState});
-    }, 1000);
-    return () => {
-      clearInterval(timer);
-    };
-  };
-  const startEffect = () => {
-    dispatch({
-      type: "SET_VARIABLE",
-      property: "isFocusModeEnabled",
-      value: true,
-    });
-    dispatch({
-      type: "GIVE_RANDOM_OPENING_REWARD",
-    });
-  };
-
-  const isTimeToGiveReward = getIsTimeToGiveOpeningRewardWithCoolDown({
-    gameState: gameState,
-    coolDownTimeMS: coolDownTimeMS,
-  });
-  if (isTimeToGiveReward && isVisible) {
-    dispatch({
-      type: "GIVE_RANDOM_OPENING_REWARD",
-    });
-    dispatch({
-      type: "HANDLE_UNRELIABLE_TIME_TICK",
-      //This should not cause an infinite loop because timeSinceEpoch changes every MS
-      timeSinceEpochMS: Date.now() + 1,
-      timeFunctionDictionary: {
-        incrementProgress,
-        changeRandomReward,
-        doNothing,
-      },
-    });
-  }
-  useEffect(startEffect, []);
-  // useEffect(saveEverySecondEffect, []);
   // if (isPending) return "Loading...";
+
+  return <GameView gameState={gameState} dispatch={dispatch} />;
+}
+
+function GameView({gameState, dispatch}) {
   //TODO replace with use previous
   const allComputedProperties = getComputedProperties(gameState);
-
-  const {
-    totalPoints,
-    pointsRemaining,
-    hasRecentlyWon,
-    lastReward,
-  } = allComputedProperties;
+  const [
+    isInititialRewardAnimationComplete,
+    setIsRewardAnimationComplete,
+  ] = useState(false);
 
   const [shouldRelease, setShouldRelease] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
 
+  if (gameState.isComplete) {
+    return <EndScreenOverlay gameState={gameState} dispatch={dispatch} />;
+  }
   return (
     <>
+      <button
+        onClick={() => {
+          dispatch({
+            type: "END_GAME",
+            now: Date.now(),
+            setting: gameState.currentSettings,
+          });
+        }}
+      >
+        rest
+      </button>
+
       <PageVisibility
         onChange={(isVisible1) => {
           const pauseOrUnpauseGame = isVisible1 ? unPauseGame() : pauseGame();
@@ -133,7 +99,7 @@ export function Game({state = createState(), seed = Date.now()}) {
         <HoldOrReleaseCommand
           shouldRelease={
             allComputedProperties.lastReward > 0 &&
-            !gameState.isWaitingForReward
+            !gameState.isWaitingForRewardWheel
           }
         />
         <PointCalculationAnimation gameState={gameState} dispatch={dispatch} />
@@ -143,19 +109,50 @@ export function Game({state = createState(), seed = Date.now()}) {
           dispatch={dispatch}
           //TODO move animation
           shouldShowPoints={
-            isInititialRewardAnimationComplete && !gameState.isWaitingForReward
+            isInititialRewardAnimationComplete &&
+            !gameState.isWaitingForRewardWheel
           }
         />
         <GainPointsUserActions gameState={gameState} dispatch={dispatch} />
-        <MaybeRewardForOpening
-          gameState={gameState}
-          coolDownTimeMS={coolDownTimeMS}
-          rewardAmount={gameState.userActionPoints}
-          onRewardShown={() => {
-            setIsRewardAnimationComplete(true);
-          }}
-        />
       </GameWrapper>
+    </>
+  );
+}
+
+function PointsStatusInformation({gameState}) {
+  const computedProperties = getComputedProperties(gameState);
+  const {isActivityComplete} = {
+    ...gameState,
+    ...computedProperties,
+  };
+
+  let statusMessage = null;
+  if (isActivityComplete) {
+    statusMessage = <div>Activity Complete </div>;
+  } else {
+  }
+
+  return <>{statusMessage}</>;
+}
+
+function EndScreenOverlay({gameState, dispatch}) {
+  return (
+    <>
+      <div>
+        <h3>Training Complete</h3>
+        <p>To get the full benefits, execute on the plan you set in place</p>
+        <ul>
+          <li>Open Habit Tracking App</li>
+          <li>Open a Website blocker</li>
+        </ul>
+        <button
+          onClick={() => {
+            dispatch({type: "RESET_GAME"});
+          }}
+        >
+          Reset
+        </button>
+      </div>
     </>
   );
 }
@@ -167,7 +164,7 @@ function GainPointsUserActions({gameState, dispatch}) {
     <>
       <div>
         <h2>Gain Points</h2>
-        <ActionProgress />
+        {/* <ActionProgress /> */}
         <UserOneTimeActions
           actionList={actionNames}
           valueList={actionValues}
@@ -177,11 +174,10 @@ function GainPointsUserActions({gameState, dispatch}) {
               itemName: itemSelected,
             });
 
-            dispatch(
-              changeUserPointsAction(
-                gameState.userActionPoints + userActionValue,
-              ),
-            );
+            dispatch({
+              type: "COMPLETE_USER_ACTION",
+              name: itemSelected,
+            });
           }}
         />
       </div>

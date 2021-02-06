@@ -60,7 +60,9 @@ export function getWinOrLossMeaningConfig({
 
   const getNumberToShowFromPercentComplete = ({percentComplete, seed}) => {
     // if you take more decimals than 1 it will jump around too quickly
-    const currentFrameIndex = parseInt(percentComplete / animationPercentStep);
+    const currentFrameIndex = parseInt(
+      (percentComplete * 100) / animationPercentStep,
+    );
     return finalNumbers[currentFrameIndex];
   };
 

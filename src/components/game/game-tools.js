@@ -3,8 +3,8 @@ import produce from "immer";
 import {
   getRandomBoolean,
   getRandomIntInclusive,
-  randomReducer
-} from 'components/random-reducer';
+  randomReducer,
+} from "components/random-reducer";
 import {reduceGameState} from "components/game-reducer";
 
 export function getUserOneTimeActions(state) {
@@ -49,12 +49,16 @@ export function getComputedProperties(gameState) {
   if (pointsRemaining < 0) {
     throw new Error("Used more points then available");
   }
+  const actionsRemaining = gameState.userActionPoints;
   return {
     totalPoints,
     pointsRemaining,
     previousTotalReward,
+    actionsRemaining,
     lastReward,
+    isActivityComplete: totalPoints > 0,
     hasRecentlyWon: lastReward > 0,
+    isSpinningDisabled: pointsRemaining < 1 || gameState.isWaitingToHideWheel,
   };
 }
 
@@ -103,7 +107,10 @@ export function changeRandomReward(gameState) {
     if (shouldGiveRandomReward) {
       return reduceGameState(
         newState,
-        changeUserPointsAction(gameState.userActionPoints + 3),
+        changeUserPointsAction(
+          gameState.userActionPoints +
+            gameState.currentSettings.openRewardValue,
+        ),
       );
     }
 
