@@ -2,21 +2,20 @@ export const changeSpeed = (value) => value;
 
 export const obtainSettings = () => {
   return {
-    probabiltyOfWinPercentDecimal: 0.4,
+    spinWinProbability: 0.4,
     openRewardValue: 2,
+    openingRewardProbability: 0.8,
     animationConfig: {
       minNumberToShow: 1,
       maxNumberToShow: 18,
     },
+    finalAction:
+      "Final Action: Hold for 15 more seconds to show you can handle discomfort",
     userActionsValueDictionary: {
       oneTimeActions: {
         "Close distracting websites: YouTube.com etc": 2,
         "Identify next action": 2 /*make next action specific, easy, able to do now if not break it inot smaller steps*/,
-
-        "Hold Negative motions Breath 10 seconds in 10 seconds out": 1,
-        "Do heart rate breathing 10s": 1,
         "Open Scheduler Or Habit App": 0.5,
-        "Go to working location": 1,
       },
     },
   };

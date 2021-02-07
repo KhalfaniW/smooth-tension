@@ -187,37 +187,45 @@ function percentToScaledProgress(percentComplete, limit = 0.9) {
 
   return percentCompleteToShow;
 }
-function getNextStep({
-  currentPercentShown,
-  currentPercent,
-  newPercent,
-  max,
-  shownMax,
-}) {
-  const shownDistanceToEnd = shownMax - currentPercentShown,
-    realStep = newPercent - currentPercent,
-    realOldDistanceToEnd = max - currentPercent,
-    stepsToShow = realOldDistanceToEnd / realStep;
-
-  const nextShownStep = shownDistanceToEnd / stepsToShow;
-
-  return currentPercentShown + nextShownStep;
-}
 function RandomNumberSpinProgressView({
   previousPercentComplete,
   percentComplete,
 }) {
   //TODO extract this logic
+  function getPercentToShow({currentPercent, shownMax, distance}) {
+    const realPercentToShownPercent = ({distance, currentPercent, maxToShow}) =>
+      distance * (currentPercent / maxToShow);
 
-  const currentMax = percentComplete >= 0.99 ? 1 : 0.9;
-  const newValue = getNextStep({
-    max: 1,
-    currentPercentShown: previousPercentComplete,
-    currentPercent: percentComplete * currentMax,
-    newPercent: percentComplete,
-    shownMax: percentComplete * currentMax,
-  });
-  // const percentCompleteToShow = percentToScaledProgress(percentComplete);
+    const config = {
+      currentPercent,
+      distance: distance,
+      maxToShow: shownMax,
+    };
+    console.log({
+      currentPercent,
+      distance: distance,
+      maxToShow: shownMax,
+      x: currentPercent / shownMax,
+      shown: realPercentToShownPercent(config),
+      ...config,
+    });
+
+    return realPercentToShownPercent(config);
+  }
+  let newValue = 0;
+  if (percentComplete <= 0.99) {
+    newValue = getPercentToShow({
+      currentPercent: percentComplete,
+      shownMax: 0.9,
+      distance: 0.5,
+    });
+  } else {
+    const distance = 0.5;
+    const percentDistanceleft = 1 - (1 - percentComplete) / (1 - 0.99);
+    newValue = distance * percentDistanceleft + 0.5;
+  }
+
+  //  const newValue = percentToScaledProgress(percentComplete);
 
   return (
     <div>
@@ -237,3 +245,4 @@ function RandomNumberSpinProgressView({
     </div>
   );
 }
+const _ = require("lodash");

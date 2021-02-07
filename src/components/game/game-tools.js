@@ -8,14 +8,23 @@ import {
 import {reduceGameState} from "components/game-reducer";
 
 export function getUserOneTimeActions(state) {
-  return Object.keys(
+  const {isFinalActionAvailable} = getComputedProperties(state);
+  const basicActions = Object.keys(
     state.currentSettings.userActionsValueDictionary.oneTimeActions,
   );
+
+  if (isFinalActionAvailable) {
+    return basicActions.concat(state.finalAction);
+  }
+
+  return basicActions;
 }
 
 export function getUserOneTimeActionValues(state) {
   return getUserOneTimeActions(state).map((actionName) =>
-    getUserOneTimeActionValue({state, itemName: actionName}),
+    actionName === state.finalAction
+      ? 0
+      : getUserOneTimeActionValue({state, itemName: actionName}),
   );
 }
 
@@ -49,16 +58,23 @@ export function getComputedProperties(gameState) {
   if (pointsRemaining < 0) {
     throw new Error("Used more points then available");
   }
-  const actionsRemaining = gameState.userActionPoints;
+  const actionsList = Object.keys(gameState.userActions);
+  const actionsRemaining = actionsList.filter((actionName) => {
+    const actionIsNotDone = !gameState.userActions[actionName].isComplete;
+    return actionIsNotDone;
+  }).length;
+
   return {
     totalPoints,
     pointsRemaining,
     previousTotalReward,
     actionsRemaining,
     lastReward,
-    isActivityComplete: totalPoints > 0,
+    isActivityComplete: gameState.totalReward > 0,
     hasRecentlyWon: lastReward > 0,
     isSpinningDisabled: pointsRemaining < 1 || gameState.isWaitingToHideWheel,
+    isFinalActionAvailable: actionsRemaining === 0,
+    hasReceivedOpeningReward: gameState.openingRewardAmount > 0,
   };
 }
 
@@ -89,7 +105,7 @@ export function getIsTimeToGiveOpeningRewardWithCoolDown({
   return isTimeForNextReward;
 }
 
-export function changeRandomReward(gameState) {
+export function checkOpeningRandomReward(gameState) {
   return produce(gameState, (draftState) => {
     const stateWithUpdatedTime = produce(gameState, (draftState1) => {
       draftState1.isRandomRewardChecked = true;
@@ -101,20 +117,18 @@ export function changeRandomReward(gameState) {
       shouldGiveRandomReward,
     } = getShouldGiveRandomRewardFromState({
       state: stateWithUpdatedTime,
-      probabilityDecimal: 0.5,
+      probabilityDecimal: gameState.currentSettings.openingRewardProbability,
     });
 
-    if (shouldGiveRandomReward) {
-      return reduceGameState(
-        newState,
-        changeUserPointsAction(
-          gameState.userActionPoints +
-            gameState.currentSettings.openRewardValue,
-        ),
-      );
-    }
-
-    return newState;
+    return produce(newState, (draftState) => {
+      if (shouldGiveRandomReward) {
+        draftState.shouldReceiveOpeningReward = true;
+        draftState.openingRewardAmount +=
+          gameState.currentSettings.openRewardValue;
+        draftState.userActionPoints +=
+          gameState.currentSettings.openRewardValue;
+      }
+    });
   });
 }
 

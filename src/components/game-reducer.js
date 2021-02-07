@@ -1,6 +1,6 @@
 import produce from "immer";
 
-import {changeRandomReward} from "components/game/game-tools";
+import {checkOpeningRandomReward} from "components/game/game-tools";
 
 import {createRandomSeedState, randomReducer} from "./random-reducer";
 import {createTimerState, timeReducer} from "./time-reducer";
@@ -60,8 +60,6 @@ export function reduceGameState(state, action) {
       case "SET_OBJECT": //TODO remove
         draftState[action.property] = action.value;
         break;
-      case "GIVE_RANDOM_OPENING_REWARD":
-        return changeRandomReward(draftState);
       case "BEGIN_WAITING_FOR_REWARD":
         draftState.isWaitingForRewardWheel = true;
         draftState.pointAnimationCount++;
@@ -89,6 +87,12 @@ export function reduceGameState(state, action) {
         break;
 
       case "COMPLETE_USER_ACTION":
+        console.log({n: action.name, d: draftState.finalAction});
+        if (action.name === draftState.finalAction) {
+          draftState.userActionPoints += 1;
+          draftState.currentSettings.spinWinProbability = 1;
+          return;
+        }
         let newState3 = produce(oldState, (draftState) => {
           draftState.userActions[action.name].isComplete = true;
         });
@@ -113,6 +117,7 @@ export function initializeState({emptyGameState, gameSettings, now}) {
     seed: now,
     timeSinceEpochMS: now,
     startTime: now,
+    isFocusModeEnabled: true,
   };
   const actionValues = gameSettings.userActionsValueDictionary.oneTimeActions;
   const userActionList = Object.keys(actionValues);
@@ -124,12 +129,9 @@ export function initializeState({emptyGameState, gameSettings, now}) {
     };
   }, {});
   gameState.userActions = userActionMap;
+  gameState.finalAction = gameSettings.finalAction;
 
-  gameState = reduceGameState(gameState, {
-    type: "SET_VARIABLE",
-    property: "isFocusModeEnabled",
-    value: true,
-  });
+  gameState = checkOpeningRandomReward(gameState);
 
   return gameState;
 }
@@ -145,12 +147,14 @@ export function createGameState(seed = 5) {
     initialReward: 0,
     isRandomRewardChecked: false,
     isWaitingToHideWheel: false,
+    openingRewardAmount: 0,
     progressAmount: 0,
     defaultIncrementInterval: 1000,
     pointAnimationCount: 0,
     incrementAmount: 0.1,
     speedMultiplier: 1,
     userActions: {},
+    finalAction: "",
     isWaitingForRewardWheel: false,
     isVisible: true,
     pointsUsed: 0,

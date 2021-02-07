@@ -2,24 +2,19 @@ import {Checkbox, FormControlLabel} from "@material-ui/core";
 import React, {useState} from "react";
 import styled from "styled-components";
 
-export function UserOneTimeActions({onComplete, actionList, valueList}) {
-  const originalDictionary = actionList.reduce(function(dictionary, item) {
-    dictionary[item] = false;
-    return dictionary;
-  }, {});
-
-  const [isCompletedDictionary, setDictionary] = useState({
-    ...originalDictionary,
-  });
+export function UserOneTimeActions({
+  onComplete,
+  completedList,
+  actionList,
+  valueList,
+}) {
+  function getIsComplete(name) {
+    return completedList.includes(name);
+  }
   function handleCheckboxSelect(event) {
     const item = event.target.name;
-    const hasItemNotBeenCompleted = isCompletedDictionary[item] === false;
-
-    if (event.target.checked && hasItemNotBeenCompleted) {
+    if (event.target.checked) {
       onComplete(item);
-      setDictionary((isCompletedDictionary) => {
-        return {...isCompletedDictionary, [item]: true};
-      });
     }
   }
   return (
@@ -32,7 +27,7 @@ export function UserOneTimeActions({onComplete, actionList, valueList}) {
             key={userAction}
             value="start"
             label={userAction + " |  value:" + actionValue}
-            disabled={isCompletedDictionary[userAction]}
+            disabled={getIsComplete(userAction)}
             name={userAction}
             control={
               <Checkbox color="primary" onChange={handleCheckboxSelect} />

@@ -6,7 +6,7 @@ import {ActionProgress} from "components/game/game-progress";
 import {GameWrapper, HoldTensionBox, ReleaseTensionBox} from "styles/boxes";
 import {UserOneTimeActions} from "components/game/user-actions";
 import {
-  changeRandomReward,
+  checkOpeningRandomReward,
   changeUserPointsAction,
   doNothing,
   getComputedProperties,
@@ -49,19 +49,21 @@ export function Game({
 
   // if (isPending) return "Loading...";
 
-  return <GameView gameState={gameState} dispatch={dispatch} />;
+  return (
+    <>
+      <PageVisibility
+        onChange={(isVisible1) => {
+          const pauseOrUnpauseGame = isVisible1 ? unPauseGame() : pauseGame();
+          dispatch(pauseOrUnpauseGame);
+        }}
+      ></PageVisibility>
+      <GameView gameState={gameState} dispatch={dispatch} />
+    </>
+  );
 }
 
 function GameView({gameState, dispatch}) {
-  //TODO replace with use previous
   const allComputedProperties = getComputedProperties(gameState);
-  const [
-    isInititialRewardAnimationComplete,
-    setIsRewardAnimationComplete,
-  ] = useState(false);
-
-  const [shouldRelease, setShouldRelease] = useState(false);
-  const [isVisible, setIsVisible] = useState(true);
 
   if (gameState.isComplete) {
     return <EndScreenOverlay gameState={gameState} dispatch={dispatch} />;
@@ -80,14 +82,6 @@ function GameView({gameState, dispatch}) {
         rest
       </button>
 
-      <PageVisibility
-        onChange={(isVisible1) => {
-          const pauseOrUnpauseGame = isVisible1 ? unPauseGame() : pauseGame();
-          dispatch(pauseOrUnpauseGame);
-          setIsVisible(isVisible1);
-        }}
-      ></PageVisibility>
-
       <GameWrapper
         onMouseEnter={() => {
           dispatch(unPauseGame());
@@ -103,15 +97,12 @@ function GameView({gameState, dispatch}) {
           }
         />
         <PointCalculationAnimation gameState={gameState} dispatch={dispatch} />
-
+        <StatusInformation gameState={gameState} />
         <PointsShop
           gameState={gameState}
           dispatch={dispatch}
           //TODO move animation
-          shouldShowPoints={
-            isInititialRewardAnimationComplete &&
-            !gameState.isWaitingForRewardWheel
-          }
+          shouldShowPoints={!gameState.isWaitingForRewardWheel}
         />
         <GainPointsUserActions gameState={gameState} dispatch={dispatch} />
       </GameWrapper>
@@ -119,20 +110,20 @@ function GameView({gameState, dispatch}) {
   );
 }
 
-function PointsStatusInformation({gameState}) {
+function StatusInformation({gameState}) {
   const computedProperties = getComputedProperties(gameState);
-  const {isActivityComplete} = {
+  const {isActivityComplete, openingRewardAmount, hasReceivedOpeningReward} = {
     ...gameState,
     ...computedProperties,
   };
 
-  let statusMessage = null;
   if (isActivityComplete) {
-    statusMessage = <div>Activity Complete </div>;
-  } else {
+    return <div>Activity Complete </div>;
+  } else if (hasReceivedOpeningReward) {
+    return <div>Free Spins Won By Opening App: {openingRewardAmount}</div>;
   }
 
-  return <>{statusMessage}</>;
+  return null;
 }
 
 function EndScreenOverlay({gameState, dispatch}) {
@@ -159,6 +150,13 @@ function EndScreenOverlay({gameState, dispatch}) {
 
 function GainPointsUserActions({gameState, dispatch}) {
   const actionNames = getUserOneTimeActions(gameState);
+  const completedNames = actionNames.filter((name) => {
+    const isCheckingFinalActionIsDone = name === gameState.finalAction;
+    if (isCheckingFinalActionIsDone) {
+      return false;
+    }
+    return gameState.userActions[name].isComplete;
+  });
   const actionValues = getUserOneTimeActionValues(gameState);
   return (
     <>
@@ -167,13 +165,9 @@ function GainPointsUserActions({gameState, dispatch}) {
         {/* <ActionProgress /> */}
         <UserOneTimeActions
           actionList={actionNames}
+          completedList={completedNames}
           valueList={actionValues}
           onComplete={(itemSelected) => {
-            const userActionValue = getUserOneTimeActionValue({
-              state: gameState,
-              itemName: itemSelected,
-            });
-
             dispatch({
               type: "COMPLETE_USER_ACTION",
               name: itemSelected,

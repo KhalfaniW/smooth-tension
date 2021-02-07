@@ -51,7 +51,7 @@ function spendAPoint({gameState, dispatch}) {
   });
 
   const shouldGiveRandomReward = getShouldGiveRandomReward({
-    probabilityDecimal: gameState.currentSettings.probabiltyOfWinPercentDecimal,
+    probabilityDecimal: gameState.currentSettings.spinWinProbability,
     seed: gameState.seed,
   });
 
