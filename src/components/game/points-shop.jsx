@@ -28,6 +28,7 @@ export default function PointsShop({gameState, dispatch, shouldShowPoints}) {
         ) : (
           <button
             disabled={isSpinningDisabled}
+            className="self-center px-4 py-1 rounded-full bg-blue-700 text-coolGray-50"
             onClick={() => {
               spendAPoint({dispatch: dispatch, gameState: gameState});
               dispatch({type: "BEGIN_WAITING_FOR_REWARD"});

@@ -129,10 +129,10 @@ export function initializeState({emptyGameState, gameSettings, now}) {
     };
   }, {});
   gameState.userActions = userActionMap;
-  gameState.finalAction = gameSettings.finalAction;
-
-  gameState = checkOpeningRandomReward(gameState);
-
+  if (gameState.finalAction == "") {
+    gameState.finalAction = gameSettings.finalAction;
+    gameState = checkOpeningRandomReward(gameState);
+  }
   return gameState;
 }
 

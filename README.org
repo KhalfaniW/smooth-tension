@@ -2,3 +2,8 @@
    + do nothing or
    + jump off to other 
   other tools: capture attention and promote mindfulness with minimal friction
+* How 
+  :PROPERTIES:
+  :CREATED:  [2021-02-04 Thu 12:05]
+  :END:
+  + Uses Tailwind css 

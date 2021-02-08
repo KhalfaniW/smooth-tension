@@ -10,7 +10,6 @@ export function ActionProgress({}) {
           <div style={{width: "70%"}}>
             {/* <ReactBootstrapStyle /> */}
             {/* <ProgressBar now={props.value} /> */}
-            {props.value.toFixed(0)}/100
           </div>
         )}
       </Spring>

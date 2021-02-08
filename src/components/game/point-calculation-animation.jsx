@@ -7,7 +7,7 @@ import {getRandomBoolean} from "components/random-reducer";
 import {getWinOrLossMeaningConfig} from "components/game/animation-tools";
 
 export const PointAnimationDisplayBox = ({children}) => (
-  <div className="border h-40 w-60">{children}</div>
+  <div className="rounded shadow border h-40 w-60">{children}</div>
 );
 export default function PointCalculationAnimation({gameState, dispatch}) {
   const {hasRecentlyWon} = getComputedProperties(gameState);
@@ -235,13 +235,6 @@ function RandomNumberSpinProgressView({
           style={{width: `${newValue * 100}%`}}
         ></div>
       </div>
-      {
-        <NumberFormat
-          value={percentComplete * 100}
-          displayType={"text"}
-        ></NumberFormat>
-      }
-      / 100
     </div>
   );
 }

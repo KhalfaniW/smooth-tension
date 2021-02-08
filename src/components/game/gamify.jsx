@@ -3,7 +3,7 @@ import PageVisibility from "react-page-visibility";
 import React, {useState} from "react";
 
 import {ActionProgress} from "components/game/game-progress";
-import {GameWrapper, HoldTensionBox, ReleaseTensionBox} from "styles/boxes";
+import {HoldTensionBox, ReleaseTensionBox} from "styles/boxes";
 import {UserOneTimeActions} from "components/game/user-actions";
 import {
   checkOpeningRandomReward,
@@ -31,15 +31,12 @@ const minutesToMS = (minutes) => minutes * 60 * 1000;
 const coolDownTimeMS = minutesToMS(10);
 const rewardDelayAnimationTime = 1000;
 //reset should  be a level above to remount and reset effects
-export function Game({
-  state = initializeState({
-    now: Date.now(),
-    emptyGameState: createGameState(),
-    gameSettings: obtainSettings(),
-  }),
-
-  seed = Date.now(),
-}) {
+const defaultInitialState = initializeState({
+  now: Date.now(),
+  emptyGameState: createGameState(),
+  gameSettings: obtainSettings(),
+});
+export function Game({state = defaultInitialState}) {
   const [gameState, setGameState] = useState(state);
   //TODO refractor previous with usePrevious for all properties not needed to be used by reducer
 
@@ -65,31 +62,9 @@ export function Game({
 function GameView({gameState, dispatch}) {
   const allComputedProperties = getComputedProperties(gameState);
 
-  if (gameState.isComplete) {
-    return <EndScreenOverlay gameState={gameState} dispatch={dispatch} />;
-  }
   return (
     <>
-      <button
-        onClick={() => {
-          dispatch({
-            type: "END_GAME",
-            now: Date.now(),
-            setting: gameState.currentSettings,
-          });
-        }}
-      >
-        rest
-      </button>
-
-      <GameWrapper
-        onMouseEnter={() => {
-          dispatch(unPauseGame());
-        }}
-        onMouseLeave={() => {
-          dispatch(pauseGame());
-        }}
-      >
+      <div className="flex flex-col items-center justify-between h-full">
         <HoldOrReleaseCommand
           shouldRelease={
             allComputedProperties.lastReward > 0 &&
@@ -98,14 +73,18 @@ function GameView({gameState, dispatch}) {
         />
         <PointCalculationAnimation gameState={gameState} dispatch={dispatch} />
         <StatusInformation gameState={gameState} />
-        <PointsShop
-          gameState={gameState}
-          dispatch={dispatch}
-          //TODO move animation
-          shouldShowPoints={!gameState.isWaitingForRewardWheel}
-        />
+        {gameState.isComplete ? (
+          <EndScreenOverlay gameState={gameState} dispatch={dispatch} />
+        ) : (
+          <PointsShop
+            gameState={gameState}
+            dispatch={dispatch}
+            //TODO move animation
+            shouldShowPoints={!gameState.isWaitingForRewardWheel}
+          />
+        )}
         <GainPointsUserActions gameState={gameState} dispatch={dispatch} />
-      </GameWrapper>
+      </div>
     </>
   );
 }
@@ -138,7 +117,7 @@ function EndScreenOverlay({gameState, dispatch}) {
         </ul>
         <button
           onClick={() => {
-            dispatch({type: "RESET_GAME"});
+            dispatch({type: "RESET_GAME", now: Date.now()});
           }}
         >
           Reset
@@ -160,7 +139,7 @@ function GainPointsUserActions({gameState, dispatch}) {
   const actionValues = getUserOneTimeActionValues(gameState);
   return (
     <>
-      <div>
+      <div className="pt-4">
         <h2>Gain Points</h2>
         {/* <ActionProgress /> */}
         <UserOneTimeActions

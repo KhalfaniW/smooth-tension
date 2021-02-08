@@ -8,6 +8,8 @@ import {
   RadioGroup,
   TextField,
 } from "@material-ui/core";
+import {Button} from "@material-ui/core";
+
 import {useMap} from "react-use";
 import React, {useEffect, useState} from "react";
 import lodash, {uniq} from "lodash";
@@ -21,6 +23,8 @@ import produce from "immer";
 import {InternalValuesPage} from "./value-chart";
 import {RandomRewardCreator} from "./random-reward";
 import {Game} from "components/game/gamify";
+
+import logo from "resources/logo.png";
 // import MeditationTimerGroup from "pages/meditation-timer-group";
 const tabs = Object.freeze({
   LANDING: "landing",
@@ -40,42 +44,12 @@ export default function Main() {
     case tabs.LANDING:
       pageToShow = (
         <>
-          <LandingPage
-            callToActionComponent={
-              <div className="pb-14 w-full flex flex-col justify-center">
-                <button
-                  onClick={() => {
-                    setPage(START_PAGE);
-                  }}
-                >
-                  Begin
-                </button>
-                <button
-                  onClick={() => {
-                    setPage(MAIN_PAGE);
-                  }}
-                >
-                  Quick Start
-                </button>
-                <button
-                  onClick={() => {
-                    setPage(LEARN_MORE_PAGE);
-                  }}
-                >
-                  Learn More
-                </button>
-              </div>
-            }
-          />
+          <LandingPage onQuickStart={() => setPage(MAIN_PAGE)} />
         </>
       );
       break;
     case tabs.START_INSTRUCTIONS:
-      pageToShow = (
-        <>
-          <StartPage onNextPageClick={() => setPage(MAIN_PAGE)} />
-        </>
-      );
+      pageToShow = <></>;
       break;
     case tabs.GAME:
       pageToShow = (
@@ -95,69 +69,121 @@ export default function Main() {
     </>
   );
 }
-function LandingPage({callToActionComponent}) {
-  return (
-    <div className="min-h-screen bg-gray-100 py-6 flex justify-center sm:py-12">
-      <div className="flex flex-col items-center justify-between ">
-        <div className="display-flex h-1/4  w-5/6 flex flex-col items-start justify-between">
-          <p className="pb-5 self-center">Welcome to Smooth Tension</p>
-          <p>Master discomfort</p>
-          <p>Live your values</p>
-          <p>Replace addictive software with strength and mindfulness</p>
+function LandingPage({onLearnMoreClick, onQuickStart}) {
+  const [shouldShowInstructions, setShouldShowInstructions] = useState(false);
+  const NON_BOLD_HEADING = "mb-3  text-xl font-normal leading-tight lg:text-xl";
+  const BASIC_BLUE_BUTTON =
+    "py-2 px-4 capitalize tracking-wide bg-blue-600 dark:bg-gray-800 text-white font-medium rounded hover:bg-blue-500 dark:hover:bg-gray-700 focus:outline-none focus:bg-blue-500 dark:focus:bg-gray-700";
+  let action = null;
+  if (shouldShowInstructions) {
+    //design from https://mambaui.com/components/call-to-action
+    action = (
+      <section className="py-6 bg-coolGray-100 text-coolGray-900">
+        <div className="container flex flex-col items-center justify-center p-4 space-y-8 md:p-10 md:px-24 xl:px-48">
+          <h1 className="text-4xl font-bold leading-none text-center">
+            Train your willpower
+          </h1>
+          <p className="text-xl font-medium text-center">
+            <p>Live your values</p>
+            <p>Master discomfort</p>
+            <p>Replace addictive software with mindfulness</p>
+          </p>
+          <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:space-x-8">
+            <button
+              onClick={() => {
+                setShouldShowInstructions(true);
+              }}
+              className="px-8 py-3 text-lg font-semibold rounded bg-blue-600 text-coolGray-50"
+            >
+              Get started
+            </button>
+            <button className="px-8 py-3 text-lg font-normal border rounded bg-coolGray-800 text-coolGray-50 border-coolGray-700">
+              Learn more
+            </button>
+          </div>
         </div>
+      </section>
+    );
+  } else {
+    action = (
+      <section className="py-6 bg-coolGray-100 text-coolGray-900">
+        <div className="container flex flex-col items-center justify-center p-4 space-y-8 md:p-10 md:px-24 xl:px-48">
+          <h1 className="text-4xl font-bold leading-none text-center">
+            Build your willpower
+          </h1>
+          <ul className=" text-xl font-medium pl-2 ml-8 text-left  list-inside">
+            <li className="pb-1">Live your values </li>
+            <li className="pb-1">Master discomfort</li>
+            <li className="pb-1">
+              Replace addictive software with mindfulness
+            </li>
+          </ul>
+          <div className="flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:space-x-8">
+            <button
+              onClick={() => {
+                setShouldShowInstructions(true);
+              }}
+              className="px-8 py-3 text-lg font-semibold rounded bg-blue-600 text-coolGray-50"
+            >
+              Get started
+            </button>
+            <button className="px-8 py-3 text-lg font-normal border rounded bg-coolGray-800 text-coolGray-50 border-coolGray-700">
+              Learn more
+            </button>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
-        {callToActionComponent}
+  //design from https://mambaui.com/components/
+  return (
+    <div classNameName="min-h-screen  py-6 flex justify-center sm:py-12">
+      <div className="p-4 bg-coolGray-100 text-coolGray-800">
+        <header className="container flex justify-between h-16 border-b-2 border-coolGray-300">
+          <img alt="Smooth tension logo" src={logo} />
+          <p className="self-center px-8 py-3 text-xl  rounded">
+            Smooth Tension
+          </p>
+
+          <div className="flex-shrink-0 hidden lg:block">
+            <button
+              onClick={() => {
+                onQuickStart();
+              }}
+              className="self-center px-8 py-3 rounded-full bg-gray-600 text-coolGray-50"
+            >
+              Quick Start
+            </button>
+          </div>
+          <button className="flex justify-end p-4 lg:hidden">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h16M4 18h16"
+              ></path>
+            </svg>
+          </button>
+        </header>
       </div>
+      {action}
     </div>
   );
 }
 
 function StartPage({onNextPageClick}) {
-  const NON_BOLD_HEADING = "mb-3  text-xl font-normal leading-tight lg:text-xl";
-  const BASIC_BLUE_BUTTON =
-    "py-2 px-4 capitalize tracking-wide bg-blue-600 dark:bg-gray-800 text-white font-medium rounded hover:bg-blue-500 dark:hover:bg-gray-700 focus:outline-none focus:bg-blue-500 dark:focus:bg-gray-700";
   return (
     <div className="w-full ">
       <h4 className="mb-3 font-serif text-2xl font-normal leading-tight lg:text-3xl">
         Start by creating tension
       </h4>
-      <div className="max-w-2xl mx-auto px-8 py-4 bg-white dark:bg-gray-800 rounded-lg shadow-md">
-        <ul className="">
-          <h3 className={NON_BOLD_HEADING}>
-            Ideas to create tension in your body:
-          </h3>
-
-          <li>Head</li>
-          <ul className="pb-2 pl-3 ">
-            <li>Furrow your eyebrows</li>
-            <li>Tense your tounge</li>
-          </ul>
-          <li>
-            Arms
-            <ul className="pb-2 pl-3 ">
-              <li>Clench your fists</li>
-              <li>Tense your biceps</li>
-            </ul>
-          </li>
-          <li>
-            Torso
-            <ul className="pb-2 pl-3 ">
-              <li>Tighten your abdomen</li>
-              <li>Flex your back muscles</li>
-            </ul>
-          </li>
-        </ul>
-
-        <button
-          onClick={() => {
-            onNextPageClick();
-          }}
-          className={BASIC_BLUE_BUTTON}
-        >
-          {" "}
-          Begin
-        </button>
-      </div>
     </div>
   );
 }

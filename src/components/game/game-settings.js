@@ -4,7 +4,7 @@ export const obtainSettings = () => {
   return {
     spinWinProbability: 0.4,
     openRewardValue: 2,
-    openingRewardProbability: 0.8,
+    openingRewardProbability: 0.5,
     animationConfig: {
       minNumberToShow: 1,
       maxNumberToShow: 18,
@@ -13,7 +13,7 @@ export const obtainSettings = () => {
       "Final Action: Hold for 15 more seconds to show you can handle discomfort",
     userActionsValueDictionary: {
       oneTimeActions: {
-        "Close distracting websites: YouTube.com etc": 2,
+        "Close distracting websites": 2,
         "Identify next action": 2 /*make next action specific, easy, able to do now if not break it inot smaller steps*/,
         "Open Scheduler Or Habit App": 0.5,
       },
