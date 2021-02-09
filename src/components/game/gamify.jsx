@@ -73,17 +73,19 @@ function GameView({gameState, dispatch}) {
         />
         <PointCalculationAnimation gameState={gameState} dispatch={dispatch} />
         <StatusInformation gameState={gameState} />
-        {gameState.isComplete ? (
+        {allComputedProperties.isActivityComplete ? (
           <EndScreenOverlay gameState={gameState} dispatch={dispatch} />
         ) : (
-          <PointsShop
-            gameState={gameState}
-            dispatch={dispatch}
-            //TODO move animation
-            shouldShowPoints={!gameState.isWaitingForRewardWheel}
-          />
+          <>
+            <PointsShop
+              gameState={gameState}
+              dispatch={dispatch}
+              //TODO move animation
+              shouldShowPoints={!gameState.isWaitingForRewardWheel}
+            />
+            <GainPointsUserActions gameState={gameState} dispatch={dispatch} />
+          </>
         )}
-        <GainPointsUserActions gameState={gameState} dispatch={dispatch} />
       </div>
     </>
   );
@@ -140,8 +142,6 @@ function GainPointsUserActions({gameState, dispatch}) {
   return (
     <>
       <div className="pt-4">
-        <h2>Gain Points</h2>
-        {/* <ActionProgress /> */}
         <UserOneTimeActions
           actionList={actionNames}
           completedList={completedNames}

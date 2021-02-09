@@ -121,8 +121,13 @@ function RandomRewardAnimation({
         config={{friction: 25, tension: 35, clamp: true}}
       >
         {(props) => {
+          // automatically rounding up will make it look like it's done when it's at >=99.5%
+          const progressNumberRoundedDownAtEnd =
+            props.number === 100 ? 100 : Math.min(props.number, 99.9);
+
           // if you take more decimals than 1 it will jump around too quickly
-          const percentComplete = Number(props.number.toFixed(1)) / 100;
+          const percentComplete = progressNumberRoundedDownAtEnd / 100;
+
           const numberToShow = getNumberToShowFromPercentComplete({
             seed: seed,
             percentComplete: percentComplete,

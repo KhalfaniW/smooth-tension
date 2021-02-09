@@ -73,9 +73,6 @@ export function reduceGameState(state, action) {
       case "END_WAITING_TO_HIDE_REWARD_CREATOR":
         draftState.isWaitingToHideWheel = false;
         break;
-      case "END_GAME":
-        draftState.isComplete = true;
-        break;
       case "RESET_GAME":
         return initializeState({
           emptyGameState: createGameState(),
@@ -142,7 +139,6 @@ export function createGameState(seed = 5) {
     ...createTimerState(),
     totalReward: 0,
     userActionPoints: 0,
-    isComplete: false,
     isTimerRunning: false,
     initialReward: 0,
     isRandomRewardChecked: false,

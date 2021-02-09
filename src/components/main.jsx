@@ -1,30 +1,10 @@
-import {
-  Checkbox,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  FormLabel,
-  Radio,
-  RadioGroup,
-  TextField,
-} from "@material-ui/core";
-import {Button} from "@material-ui/core";
+import React, {useState} from "react";
 
-import {useMap} from "react-use";
-import React, {useEffect, useState} from "react";
-import lodash, {uniq} from "lodash";
-
-import {MeditationTimer} from "components/timers";
-import {Stack} from "components/react-layout";
-import CalmPlaylist from "components/calm-playlist";
-import WorkBreakTimer from "components/work-break-timer";
-
-import produce from "immer";
-import {InternalValuesPage} from "./value-chart";
-import {RandomRewardCreator} from "./random-reward";
 import {Game} from "components/game/gamify";
-
+import {Stack} from "components/react-layout";
+import LearnMorePage from "components/learn-more-page";
 import logo from "resources/logo.png";
+
 // import MeditationTimerGroup from "pages/meditation-timer-group";
 const tabs = Object.freeze({
   LANDING: "landing",
@@ -49,7 +29,7 @@ export default function Main() {
       );
       break;
     case tabs.START_INSTRUCTIONS:
-      pageToShow = <></>;
+      pageToShow = <>{/* <LearnMorePage /> */}</>;
       break;
     case tabs.GAME:
       pageToShow = (
@@ -138,7 +118,7 @@ function LandingPage({onLearnMoreClick, onQuickStart}) {
 
   //design from https://mambaui.com/components/
   return (
-    <div classNameName="min-h-screen  py-6 flex justify-center sm:py-12">
+    <div classNameName="w-full min-h-screen  py-6 flex justify-center sm:py-12">
       <div className="p-4 bg-coolGray-100 text-coolGray-800">
         <header className="container flex justify-between h-16 border-b-2 border-coolGray-300">
           <img alt="Smooth tension logo" src={logo} />
@@ -174,16 +154,6 @@ function LandingPage({onLearnMoreClick, onQuickStart}) {
         </header>
       </div>
       {action}
-    </div>
-  );
-}
-
-function StartPage({onNextPageClick}) {
-  return (
-    <div className="w-full ">
-      <h4 className="mb-3 font-serif text-2xl font-normal leading-tight lg:text-3xl">
-        Start by creating tension
-      </h4>
     </div>
   );
 }

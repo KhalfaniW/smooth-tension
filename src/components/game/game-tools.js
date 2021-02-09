@@ -70,7 +70,8 @@ export function getComputedProperties(gameState) {
     previousTotalReward,
     actionsRemaining,
     lastReward,
-    isActivityComplete: gameState.totalReward > 0,
+    isActivityComplete:
+      gameState.totalReward > 0 && !gameState.isWaitingToHideWheel,
     hasRecentlyWon: lastReward > 0,
     isSpinningDisabled: pointsRemaining < 1 || gameState.isWaitingToHideWheel,
     isFinalActionAvailable: actionsRemaining === 0,

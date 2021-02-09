@@ -20,8 +20,8 @@ export function UserOneTimeActions({
   return (
     <div className=" w-full p-8  flex justify-center font-sans">
       <div className="rounded bg-gray-200 w-64 p-2 shadow-xl">
-        <div className="flex justify-between py-1 text-center">
-          <h3 className="">Get Spins</h3>
+        <div className="flex flex-col py-1 items-center">
+          <h3>Get Spins</h3>
         </div>
 
         {actionList.map((_, index) => {
