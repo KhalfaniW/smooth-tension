@@ -1,20 +1,8 @@
-import {useInterval} from "ahooks";
 import PageVisibility from "react-page-visibility";
 import React, {useState} from "react";
 
-import {ActionProgress} from "components/game/game-progress";
 import {HoldTensionBox, ReleaseTensionBox} from "styles/boxes";
 import {UserOneTimeActions} from "components/game/user-actions";
-import {
-  checkOpeningRandomReward,
-  changeUserPointsAction,
-  doNothing,
-  getComputedProperties,
-  getUserOneTimeActionValue,
-  getUserOneTimeActionValues,
-  getUserOneTimeActions,
-  incrementProgress,
-} from "components/game/game-tools";
 import {
   createGameState,
   initializeState,
@@ -22,8 +10,13 @@ import {
   reduceGameState,
   unPauseGame,
 } from "components/game-reducer";
+import {
+  getComputedProperties,
+  getUserOneTimeActionValues,
+  getUserOneTimeActions,
+} from "components/game/game-tools";
 import {obtainSettings} from "components/game/game-settings";
-import MaybeRewardForOpening from "components/game/game-reward-for-opening";
+import EndView from "components/game/end-view";
 import PointCalculationAnimation from "components/game/point-calculation-animation";
 import PointsShop from "components/game/points-shop";
 
@@ -74,7 +67,7 @@ function GameView({gameState, dispatch}) {
         <PointCalculationAnimation gameState={gameState} dispatch={dispatch} />
         <StatusInformation gameState={gameState} />
         {allComputedProperties.isActivityComplete ? (
-          <EndScreenOverlay gameState={gameState} dispatch={dispatch} />
+          <EndView gameState={gameState} dispatch={dispatch} />
         ) : (
           <>
             <PointsShop
@@ -98,35 +91,11 @@ function StatusInformation({gameState}) {
     ...computedProperties,
   };
 
-  if (isActivityComplete) {
-    return <div>Activity Complete </div>;
-  } else if (hasReceivedOpeningReward) {
+  if (!isActivityComplete && hasReceivedOpeningReward) {
     return <div>Free Spins Won By Opening App: {openingRewardAmount}</div>;
   }
 
   return null;
-}
-
-function EndScreenOverlay({gameState, dispatch}) {
-  return (
-    <>
-      <div>
-        <h3>Training Complete</h3>
-        <p>To get the full benefits, execute on the plan you set in place</p>
-        <ul>
-          <li>Open Habit Tracking App</li>
-          <li>Open a Website blocker</li>
-        </ul>
-        <button
-          onClick={() => {
-            dispatch({type: "RESET_GAME", now: Date.now()});
-          }}
-        >
-          Reset
-        </button>
-      </div>
-    </>
-  );
 }
 
 function GainPointsUserActions({gameState, dispatch}) {
