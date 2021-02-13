@@ -1,9 +1,4 @@
-<<<<<<< HEAD
 * Goal 
-=======
-* Goal : 
->>>>>>> 6641e1b7246cc4e868cd0e554458b24d859a04a8
-  Replace or Interrupt Youtube and Facebook with self created discomfort. 
 
   Distract users until they are able to focus on what to do next.
 
