@@ -56,7 +56,7 @@ export default function Main() {
   }
   return (
     <>
-      <div className="top-0 left-0 absolute w-screen h-screen bg-coolGray-100">
+      <div className="top-0 left-0 absolute w-screen min-h-screen bg-coolGray-100">
         {pageToShow}
       </div>
     </>
