@@ -4,7 +4,7 @@
 
   - Create the following user state change 
     #+begin_example
-    bored => discomfort => action
+    boredom => discomfort => action
     #+end_example
 
 ** What this will do  
