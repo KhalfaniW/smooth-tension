@@ -1,9 +1,33 @@
-* Goal : Get you through boredom 
-   + do nothing or
-   + jump off to other 
-  other tools: capture attention and promote mindfulness with minimal friction
+* Goal 
+  Replace or Interrupt Youtube and Facebook with self created discomfort. 
+
+  Distract users until they are able to focus on what to do next.
+
+  - Create the following user state change 
+    #+begin_example
+    bored => discomfort => action
+    #+end_example
+
+** What this will do  
+   - How :: Use the same addictive properties mindfully to create, incrase and release discomfort
+   - How ::  Tie yourself in a tesion knot and use this to get out
+     - Build habit of using this
+     - Reccomend tensing up a muscle to release
+
+** What this will not do 
+   :PROPERTIES:
+   :CREATED:  [2021-02-12 Fri 18:15]
+   :END:
+      - Help identify existing tension
+      - Education on science behind why this works
+      - Identify What To Do Next
+ 
 * How 
   :PROPERTIES:
   :CREATED:  [2021-02-04 Thu 12:05]
   :END:
-  + Uses Tailwind css 
+  + Uses Tailwind css
+  + Landing page and Learn more page design taken from Meraki UI
+    Do no repeate yourself.
+
+    
