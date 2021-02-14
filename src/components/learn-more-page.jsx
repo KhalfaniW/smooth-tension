@@ -11,19 +11,12 @@ import React from "react";
 
 export default function LearnMorePage({onStartClick}) {
   //design from https://mambaui.com/components/
-  const stepConfigs = [
-    {
-      stepName: "Yeet",
-      instructions: "woop",
-    },
-  ];
-
   return (
     <div>
       <section className="bg-coolGray-100 text-coolGray-800">
-        <div className="container flex flex-col p-6">
-          <h2 className="py-4 text-3xl font-bold text-center">
-            How This Works
+        <div className="m-auto container flex flex-col p-6">
+          <h2 className="py-4 text-4xl font-bold text-center">
+            How Smooth Tension Works
           </h2>
           <div className="divide-y divide-coolGray-300">
             <UserActionsStep
@@ -63,7 +56,7 @@ export default function LearnMorePage({onStartClick}) {
         onClick={() => {
           onStartClick(true);
         }}
-        className="px-8 py-3 text-lg font-semibold rounded bg-blue-600 text-coolGray-50"
+        className="mb-8 px-8 py-3 text-lg font-semibold rounded bg-blue-600 text-coolGray-50"
       >
         Get started
       </button>

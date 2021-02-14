@@ -52,7 +52,7 @@ export default function LandingPage({
       <div className="p-4 w-full bg-coolGray-100 text-coolGray-800">
         <header className="mx-auto container flex justify-between h-16 border-b-2 border-coolGray-300">
           <img alt="Smooth tension logo" src={logo} />
-          <p className="self-center px-8 py-3 text-xl  rounded">
+          <p className="self-center px-8 py-3 text-3xl  rounded">
             Smooth Tension
           </p>
 
