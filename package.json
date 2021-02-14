@@ -71,12 +71,12 @@
   },
   "scripts": {
     "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
-    "start": "npm run build:style && react-scripts start",
+    "develop": "npm run build:style && react-scripts start",
     "test": "react-scripts test",
     "start2": "PORT=4000 npm run start",
     "build": "npm run build:style && react-scripts build",
     "serve": "serve -s build -l $PORT",
-    "deploy": "npm run build; npm run serve",
+    "start": "npm run build; npm run serve",
     "test-debug": "jest",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public"
