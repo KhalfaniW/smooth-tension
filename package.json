@@ -62,6 +62,7 @@
     "recharts": "^1.8.5",
     "redux": "^4.0.5",
     "seedrandom": "^3.0.5",
+    "serve": "^11.3.2",
     "showdown": "^1.9.1",
     "styled-components": "^5.2.1",
     "tailwind.macro": "^1.0.0-alpha.10",
@@ -69,12 +70,13 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "start": "serve ./build",
     "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
-    "develop": "npm run build:style && react-scripts start",
+    "start": "npm run build:style && react-scripts start",
     "test": "react-scripts test",
     "start2": "PORT=4000 npm run start",
     "build": "npm run build:style && react-scripts build",
+    "serve": "serve -s build -l $PORT",
+    "deploy": "npm run build; npm run serve",
     "test-debug": "jest",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook -s public"
