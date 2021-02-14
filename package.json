@@ -4,8 +4,6 @@
   "private": true,
   "homepage": ".",
   "dependencies": {
-    "@bit/react-bootstrap.react-bootstrap.internal.style-links": "^1.0.0",
-    "@bit/react-bootstrap.react-bootstrap.progress-bar": "^1.0.0",
     "@craco/craco": "^6.1.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.34",
     "@fortawesome/free-solid-svg-icons": "^5.15.2",
