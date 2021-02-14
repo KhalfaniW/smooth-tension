@@ -69,8 +69,8 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-
     "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
+    "deploy-github": "npm install && npm run build && mv build docs",
     "start": "npm run build:style && react-scripts start",
     "test": "react-scripts test",
     "start2": "PORT=4000 npm run start",
