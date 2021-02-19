@@ -84,7 +84,6 @@ export function reduceGameState(state, action) {
         break;
 
       case "COMPLETE_USER_ACTION":
-        console.log({n: action.name, d: draftState.finalAction});
         if (action.name === draftState.finalAction) {
           draftState.userActionPoints += 1;
           draftState.currentSettings.spinWinProbability = 1;

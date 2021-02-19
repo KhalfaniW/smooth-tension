@@ -10,13 +10,11 @@
     "@fortawesome/react-fontawesome": "^0.1.14",
     "@material-ui/core": "^4.11.0",
     "@material-ui/lab": "^4.0.0-alpha.56",
-    "@tailwindcss/postcss7-compat": "^2.0.2",
     "@testing-library/jest-dom": "^5.11.5",
     "@testing-library/react": "^11.1.1",
     "@testing-library/user-event": "^12.2.0",
     "ahooks": "^2.9.4",
     "assert": "^2.0.0",
-    "autoprefixer": "^9.8.6",
     "axios": "^0.19.2",
     "babel-plugin-macros": "^3.0.1",
     "babel-preset-next": "^1.4.0",
@@ -34,7 +32,6 @@
     "moment": "^2.29.1",
     "ms-convert": "^1.0.1",
     "parse-ms": "^2.1.0",
-    "postcss": "^8.2.4",
     "postcss-cli": "^8.3.1",
     "random-js": "^2.1.0",
     "react": "^16.13.1",
@@ -66,12 +63,11 @@
     "showdown": "^1.9.1",
     "styled-components": "^5.2.1",
     "tailwind.macro": "^1.0.0-alpha.10",
-    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.2",
     "web-vitals": "^0.2.4"
   },
   "scripts": {
     "build:style": "tailwind build src/styles/index.css -o src/styles/tailwind.css",
-    "develop": "npm run build:style && react-scripts start",
+    "start": "npm run build:style && react-scripts start",
     "test": "react-scripts test",
     "start2": "PORT=4000 npm run start",
     "build": "npm run build:style && react-scripts build",
@@ -105,6 +101,10 @@
     "@storybook/addon-links": "^6.1.17",
     "@storybook/node-logger": "^6.1.17",
     "@storybook/preset-create-react-app": "^3.1.5",
-    "@storybook/react": "^6.1.17"
+    "@storybook/react": "^6.1.17",
+    "@tailwindcss/postcss7-compat": "^2.0.3",
+    "autoprefixer": "^9.8.6",
+    "postcss": "^7.0.35",
+    "tailwindcss": "npm:@tailwindcss/postcss7-compat@^2.0.3"
   }
 }
