@@ -15,7 +15,7 @@ export const obtainSettings = () => {
       oneTimeActions: {
         "Close distracting websites": 2,
         "Identify next action": 2 /*make next action specific, easy, able to do now if not break it inot smaller steps*/,
-        "Rember your values: Why are you doing this?": 1,
+        "Remember your values: Why are you doing this?": 1,
       },
     },
   };
@@ -31,7 +31,7 @@ export const resistingSettings = {
       "Close distracting website": 0.5,
     },
     physicalState: {
-      "Breath Exersie": changeSpeed(1),
+      "Breath Exercise": changeSpeed(1),
     },
   },
 };
