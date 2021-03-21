@@ -8,7 +8,7 @@ import StartPage from "components/start-page";
 
 // import MeditationTimerGroup from "pages/meditation-timer-group";
 import {
-  BrowserRouter as Router,
+  HashRouter as Router,
   Switch,
   Route,
   Link,

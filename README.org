@@ -28,5 +28,6 @@
   + Uses Tailwind css
   + Landing page and Learn more page design taken from Meraki UI
     Do no repeate yourself.
+  + build directory is copied to docs to allow for github pages hosting
 
     
